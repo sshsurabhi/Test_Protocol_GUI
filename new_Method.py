@@ -82,9 +82,9 @@ class App(QMainWindow):
         self.timer.timeout.connect(self.update_time_label)
         self.timer.start(1000) 
         self.rm = visa.ResourceManager()
-        self.MM_button.clicked.connect(self.connect_multimeter)
+        # self.MM_button.clicked.connect(self.connect_multimeter)
         self.multimeter = None
-        self.PS_button.clicked.connect(self.connect_powersupply)
+        # self.PS_button.clicked.connect(self.connect_powersupply)
         self.powersupply = None
         self.AC_DC_box.addItems(['<select>', 'DCV', 'ACV'])
         self.AC_DC_box.currentTextChanged.connect(self.handleSelectionChange)
@@ -103,10 +103,10 @@ class App(QMainWindow):
 ##########################################################################################################################################################
         self.AC_DC_box.setEnabled(False)
         self.test_button.setEnabled(False)
-        self.MM_button.setEnabled(False)
-        self.PS_button.setEnabled(False)
-        self.Volt_button.setEnabled(False)
-        self.current_button.setEnabled(False)
+        # self.MM_button.setEnabled(False)
+        # self.PS_button.setEnabled(False)
+        # self.Volt_button.setEnabled(False)
+        # self.current_button.setEnabled(False)
         self.value_edit.setEnabled(False)
         self.connect_button.setEnabled(False)
         self.refresh_button.setEnabled(False)
@@ -121,17 +121,14 @@ class App(QMainWindow):
                 self.multimeter.read_termination = '\n'
                 self.multimeter.write_termination = '\n'
                 self.textBrowser.append(self.multimeter.read())
-                self.MM_button.setText('MM OFF')
-                self.Volt_button.setEnabled(True)
                 self.start_button.setText('SPANNUNG')
+                self.info_label.setText('Press SPANNUNG button')
             except visa.errors.VisaIOError:
-                # QMessageBox.information(self, "Multimeter Connection", "Multimeter is not present at the given IP address.")
                 self.textBrowser.append('Multimeter has not been presented')
         else:
             self.multimeter.close()
             self.multimeter = None
-            self.MM_button.setText('MM ON')
-            self.textBrowser.append('Multimeter Disconnected')
+            self.textBrowser.append(self.multimeter.read())
 
     def connect_powersupply(self):
         if not self.powersupply:
@@ -139,10 +136,9 @@ class App(QMainWindow):
                 self.powersupply = self.rm.open_resource('TCPIP0::192.168.222.141::INSTR')
                 self.powersupply.read_termination = '\n'
                 self.powersupply.write_termination = '\n'
-                self.textBrowser.setText(self.powersupply.query('*IDN?'))
+                self.textBrowser.setText(self.powersupply.resource_name)
+                self.start_button.setEnabled(False)
                 self.info_label.setText('Write CH1 in the box next to CH')
-                self.PS_button.setText('PS OFF')
-                self.PS_button.setEnabled(False)
                 self.value_edit.setEnabled(True)
                 self.vals_button.setText('CH')
             except visa.errors.VisaIOError:
@@ -208,41 +204,56 @@ class App(QMainWindow):
 
 
     def connect(self):
-            if self.start_button.text() == 'START':
-                self.on_button_click('images_/Start.png')
-                self.info_label.setText('Place the board on ESD Matte and See the Image on the right side.\n Check all your environment according to the image.\n Check All connections.Please close if anything not correct. If correct, then \nplease press the step1 Button.')
-                self.start_button.setText("Step1")
-            elif self.start_button.text() == 'Step1':
-                self.on_button_click('images_/Start1.png')
-                self.info_label.setText('Check all the "4" screws are fitted according to the image.\n If not then please fit 4x "M2,5x5" Torx and \n M 2.5 Screws on X200 & X300 \n please press the button Step2.')
-                self.start_button.setText("Step2")
-            elif self.start_button.text() == 'Step2':
-                self.on_button_click('images_/Start.png')
-                self.info_label.setText('Place back the Board on ESD Matte.')
-                self.start_button.setText("Step3")
-            elif self.start_button.text()=='Step3':
-                self.on_button_click('images_/Start3.png')
-                self.info_label.setText('Connect the other Cable to the board.\n as shown in the Image on the right.')
-                self.start_button.setText("Step4")
-            elif self.start_button.text()=='Step4':
-                self.on_button_click('images_/Start2.png')
-                self.info_label.setText('\n Press Netzteil ON Button')
-                self.start_button.setText('Step5')
-                self.start_button.setText('Netzteil ON')
-                self.PS_button.setEnabled(True)
-            elif self.start_button.text()== 'Netzteil ON':
-                self.info_label.setText('Press Netzteil ON button')
-                self.connect_powersupply()
-            elif self.start_button.text()== 'MULTI ON':
-                self.connect_multimeter()
-            elif self.start_button.text()== 'SPANNUNG':
-                self.textBrowser.append(self.powersupply.query(self.PS_channel+':VOLTage?'))
-                self.start_button.setText('STROM')
-            elif self.start_button.text()== 'STROM':
-                self.textBrowser.append(self.powersupply.query(self.PS_channel+':CURRent?'))
-            else:
-                self.start_button.setText("Start")
-                self.textBrowser.append('disconnected')
+        if self.start_button.text() == 'START':
+            self.on_button_click('images_/Start.png')
+            self.info_label.setText('Place the board on ESD Matte and See the Image on the right side.\n Check all your environment according to the image.\n Check All connections.Please close if anything not correct. If correct, then \nplease press the step1 Button.')
+            self.start_button.setText("Step1")
+        elif self.start_button.text() == 'Step1':
+            self.on_button_click('images_/Start1.png')
+            self.info_label.setText('Check all the "4" screws are fitted according to the image.\n If not then please fit 4x "M2,5x5" Torx and \n M 2.5 Screws on X200 & X300 \n please press the button Step2.')
+            self.start_button.setText("Step2")
+        elif self.start_button.text() == 'Step2':
+            self.on_button_click('images_/Start.png')
+            self.info_label.setText('Place back the Board on ESD Matte.')
+            self.start_button.setText("Step3")
+        elif self.start_button.text()=='Step3':
+            self.on_button_click('images_/Start3.png')
+            self.info_label.setText('Connect the other Cable to the board.\n as shown in the Image on the right.')
+            self.start_button.setText("Step4")
+        elif self.start_button.text()=='Step4':
+            self.on_button_click('images_/Start2.png')
+            self.info_label.setText('\n Press Netzteil ON Button')
+            self.start_button.setText('Step5')
+            self.start_button.setText('Netzteil ON')
+        elif self.start_button.text()== 'Netzteil ON':
+            self.info_label.setText('Press Netzteil ON button')
+            self.connect_powersupply()
+        elif self.start_button.text()== 'MULTI ON':
+            self.connect_multimeter()
+        elif self.start_button.text()== 'SPANNUNG':
+            self.textBrowser.append(self.powersupply.query(self.PS_channel+':VOLTage?'))
+            self.info_label.setText('Press STROM button')
+            self.start_button.setText('STROM')
+        elif self.start_button.text()== 'STROM':
+            self.textBrowser.append(self.powersupply.query(self.PS_channel+':CURRent?'))
+            self.start_button.setEnabled(False)
+            self.AC_DC_box.setEnabled(True)
+            self.test_button.setEnabled(True)
+            QMessageBox.information(self, "Information", "Select DCV in the box near AC/DC")
+        elif (self.start_button.text()== 'Messung' and self.AC_DC_box.text == 'DCV'):
+            self.mess_with_multimeter()
+            self.start_button.setText('Messung')
+        elif self.start_button.text()== 'Messung':
+            self.mess_with_multimeter()
+
+        else:
+            self.start_button.setText("Start")
+            self.textBrowser.append('disconnected')
+
+    def mess_with_multimeter(self):
+        result = self.multimeter.query('MEAS:VOLT:AC?')
+        return result
+
 
     def handleSelectionChange(self, text):
         if text == 'DCV':
@@ -269,8 +280,13 @@ class App(QMainWindow):
             self.info_label.setText('Press R709')
             
         elif self.AC_DC_box.currentText() == 'DCV' and self.test_button.text() == 'R709':
-            self.result_edit.setText(self.multimeter.query('MEASure:VOLTage:DC?'))
-            self.textBrowser.setText(str(float(self.powersupply.query('MEASure:VOLTage? CH1'))))
+            self.result_edit.setText(self.mess_with_multimeter())
+            self.textBrowser.setText(self.mess_with_multimeter())
+            self.test_button.setText('R700')
+
+        elif self.AC_DC_box.currentText() == 'DCV' and self.test_button.text() == 'R700':
+            self.result_edit.setText(self.mess_with_multimeter())
+            
 
         elif self.AC_DC_box.currentText() == 'ACV' and self.test_button.text() == 'R709':
             self.result_edit.setText(self.multimeter.query('MEAS:VOLT:AC?'))
@@ -283,6 +299,8 @@ class App(QMainWindow):
     def update_com_ports(self, com_ports):
         self.port_box.clear()
         self.port_box.addItems(com_ports)
+
+
     def connect_or_disconnect_serial_port(self):
         if self.serial_port is None:
             com_port = self.port_box.currentText()            # Get the selected com port and baud rate
@@ -331,7 +349,8 @@ class App(QMainWindow):
             self.vals_button.setText('V')
             self.info_label.setText('Write 30 in the box  next to V')
             self.value_edit.clear()
-            
+            self.on_button_click('images_/power_ON_PS.jpg')
+            self.value_edit.setValidator(QRegExpValidator(QRegExp(r'^\d+(\.\d+)?$')))
 
         elif (self.vals_button.text() == 'CH' and self.value_edit.text() in ['ch2', 'CH2', 'Ch2', 'cH2']):
             self.powersupply.write('INSTrument CH2')
@@ -339,6 +358,8 @@ class App(QMainWindow):
             self.vals_button.setText('V')
             self.info_label.setText('Enter 30 in the box  next to V')
             self.value_edit.clear()
+            self.on_button_click('images_/power_ON_PS.jpg')
+            self.value_edit.setValidator(QRegExpValidator(QRegExp(r'^\d+(\.\d+)?$')))
 
         elif (self.vals_button.text() == 'CH' and self.value_edit.text() in ['ch3', 'CH3', 'Ch3', 'cH3']):
             self.powersupply.write('INSTrument CH3')
@@ -346,14 +367,16 @@ class App(QMainWindow):
             self.vals_button.setText('V')
             self.info_label.setText('Enter 30 in the box  next to V')
             self.value_edit.clear()
+            self.on_button_click('images_/power_ON_PS.jpg')
+            self.value_edit.setValidator(QRegExpValidator(QRegExp(r'^\d+(\.\d+)?$')))
 
         elif self.vals_button.text() == 'V':
-            self.value_edit.setValidator(QRegExpValidator(QRegExp(r'^\d+(\.\d+)?$')))
             self.powersupply.write(self.PS_channel+':VOLTage ' + self.value_edit.text())
             print(self.powersupply.query(self.PS_channel+':VOLTage?'))
             self.vals_button.setText('I')
             self.info_label.setText('Enter 0.5 in the box  next to I')
             self.value_edit.clear()
+            self.on_button_click('images_/pop.png')
 
         elif self.vals_button.text() == 'I':
             self.powersupply.write('CH1:CURRent ' + str(float(self.value_edit.text())))
@@ -372,7 +395,7 @@ class App(QMainWindow):
         elif self.vals_button.text() == 'Tolz I':
             self.curr_toleranz = self.value_edit.text()
             self.value_edit.setEnabled(False)
-            self.MM_button.setEnabled(True)
+            self.start_button.setEnabled(True)
             self.info_label.setText('Press MULTI ON Button')
             self.start_button.setText('MULTI ON')
             self.powersupply.write('OUTPut CH1,ON')
@@ -436,11 +459,6 @@ class App(QMainWindow):
         # Optionally, you can open the saved workbook in an external application
         # subprocess.run(["open", workbook_name])
 #####################################################################################################################################################################################
-    def on_widget_button_clicked(self, message):
-        self.text_browser.append(message)
-
-
-
 def main():
     app = QApplication(sys.argv)
     Window = App()

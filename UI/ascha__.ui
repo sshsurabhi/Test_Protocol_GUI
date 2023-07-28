@@ -7,7 +7,7 @@
     <x>0</x>
     <y>0</y>
     <width>1588</width>
-    <height>859</height>
+    <height>1160</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -21,7 +21,7 @@
     <property name="geometry">
      <rect>
       <x>810</x>
-      <y>60</y>
+      <y>360</y>
       <width>761</width>
       <height>751</height>
      </rect>
@@ -78,8 +78,8 @@
    <widget class="QPushButton" name="start_button">
     <property name="geometry">
      <rect>
-      <x>100</x>
-      <y>70</y>
+      <x>120</x>
+      <y>290</y>
       <width>191</width>
       <height>121</height>
      </rect>
@@ -101,8 +101,8 @@
    <widget class="QLabel" name="time_label">
     <property name="geometry">
      <rect>
-      <x>1410</x>
-      <y>20</y>
+      <x>1420</x>
+      <y>10</y>
       <width>151</width>
       <height>21</height>
      </rect>
@@ -131,7 +131,7 @@
     <property name="geometry">
      <rect>
       <x>40</x>
-      <y>400</y>
+      <y>765</y>
       <width>762</width>
       <height>301</height>
      </rect>
@@ -166,11 +166,57 @@
      <number>0</number>
     </property>
    </widget>
+   <widget class="QPushButton" name="Volt_button">
+    <property name="geometry">
+     <rect>
+      <x>340</x>
+      <y>480</y>
+      <width>121</width>
+      <height>91</height>
+     </rect>
+    </property>
+    <property name="font">
+     <font>
+      <pointsize>14</pointsize>
+      <weight>75</weight>
+      <bold>true</bold>
+     </font>
+    </property>
+    <property name="text">
+     <string>Spannung</string>
+    </property>
+    <property name="checkable">
+     <bool>true</bool>
+    </property>
+   </widget>
+   <widget class="QPushButton" name="current_button">
+    <property name="geometry">
+     <rect>
+      <x>470</x>
+      <y>480</y>
+      <width>121</width>
+      <height>91</height>
+     </rect>
+    </property>
+    <property name="font">
+     <font>
+      <pointsize>14</pointsize>
+      <weight>75</weight>
+      <bold>true</bold>
+     </font>
+    </property>
+    <property name="text">
+     <string>Strom</string>
+    </property>
+    <property name="checkable">
+     <bool>true</bool>
+    </property>
+   </widget>
    <widget class="QLineEdit" name="id_Edit">
     <property name="geometry">
      <rect>
       <x>40</x>
-      <y>770</y>
+      <y>1070</y>
       <width>191</width>
       <height>41</height>
      </rect>
@@ -193,7 +239,7 @@
     <property name="geometry">
      <rect>
       <x>230</x>
-      <y>770</y>
+      <y>1070</y>
       <width>571</width>
       <height>41</height>
      </rect>
@@ -216,7 +262,7 @@
     <property name="geometry">
      <rect>
       <x>110</x>
-      <y>210</y>
+      <y>580</y>
       <width>201</width>
       <height>41</height>
      </rect>
@@ -233,7 +279,7 @@
     <property name="geometry">
      <rect>
       <x>110</x>
-      <y>260</y>
+      <y>630</y>
       <width>201</width>
       <height>41</height>
      </rect>
@@ -250,7 +296,7 @@
     <property name="geometry">
      <rect>
       <x>320</x>
-      <y>210</y>
+      <y>580</y>
       <width>131</width>
       <height>91</height>
      </rect>
@@ -273,7 +319,7 @@
     <property name="geometry">
      <rect>
       <x>460</x>
-      <y>210</y>
+      <y>580</y>
       <width>131</width>
       <height>91</height>
      </rect>
@@ -296,7 +342,7 @@
     <property name="geometry">
      <rect>
       <x>40</x>
-      <y>210</y>
+      <y>580</y>
       <width>71</width>
       <height>41</height>
      </rect>
@@ -328,7 +374,7 @@
     <property name="geometry">
      <rect>
       <x>40</x>
-      <y>260</y>
+      <y>630</y>
       <width>71</width>
       <height>41</height>
      </rect>
@@ -359,8 +405,8 @@
    <widget class="QComboBox" name="AC_DC_box">
     <property name="geometry">
      <rect>
-      <x>400</x>
-      <y>160</y>
+      <x>410</x>
+      <y>430</y>
       <width>181</width>
       <height>41</height>
      </rect>
@@ -369,8 +415,8 @@
    <widget class="QLabel" name="label">
     <property name="geometry">
      <rect>
-      <x>330</x>
-      <y>160</y>
+      <x>340</x>
+      <y>430</y>
       <width>71</width>
       <height>41</height>
      </rect>
@@ -399,7 +445,7 @@
     <property name="geometry">
      <rect>
       <x>40</x>
-      <y>310</y>
+      <y>680</y>
       <width>761</width>
       <height>82</height>
      </rect>
@@ -408,13 +454,53 @@
      <enum>QFrame::Panel</enum>
     </property>
    </widget>
+   <widget class="QPushButton" name="MM_button">
+    <property name="geometry">
+     <rect>
+      <x>40</x>
+      <y>480</y>
+      <width>141</width>
+      <height>91</height>
+     </rect>
+    </property>
+    <property name="font">
+     <font>
+      <pointsize>12</pointsize>
+      <weight>75</weight>
+      <bold>true</bold>
+     </font>
+    </property>
+    <property name="text">
+     <string>Multi ON</string>
+    </property>
+   </widget>
+   <widget class="QPushButton" name="PS_button">
+    <property name="geometry">
+     <rect>
+      <x>190</x>
+      <y>480</y>
+      <width>141</width>
+      <height>91</height>
+     </rect>
+    </property>
+    <property name="font">
+     <font>
+      <pointsize>12</pointsize>
+      <weight>75</weight>
+      <bold>true</bold>
+     </font>
+    </property>
+    <property name="text">
+     <string>Netzteil ON</string>
+    </property>
+   </widget>
    <widget class="QPushButton" name="test_button">
     <property name="geometry">
      <rect>
-      <x>620</x>
-      <y>110</y>
-      <width>121</width>
-      <height>91</height>
+      <x>600</x>
+      <y>360</y>
+      <width>201</width>
+      <height>151</height>
      </rect>
     </property>
     <property name="font">
@@ -432,7 +518,7 @@
     <property name="geometry">
      <rect>
       <x>600</x>
-      <y>270</y>
+      <y>630</y>
       <width>201</width>
       <height>31</height>
      </rect>
@@ -451,9 +537,9 @@
    <widget class="QLineEdit" name="version_edit">
     <property name="geometry">
      <rect>
-      <x>670</x>
-      <y>238</y>
-      <width>131</width>
+      <x>680</x>
+      <y>590</y>
+      <width>121</width>
       <height>31</height>
      </rect>
     </property>
@@ -472,7 +558,7 @@
     <property name="geometry">
      <rect>
       <x>600</x>
-      <y>238</y>
+      <y>590</y>
       <width>71</width>
       <height>31</height>
      </rect>
@@ -503,9 +589,9 @@
     <property name="geometry">
      <rect>
       <x>650</x>
-      <y>206</y>
+      <y>520</y>
       <width>151</width>
-      <height>31</height>
+      <height>51</height>
      </rect>
     </property>
     <property name="sizePolicy">
@@ -529,9 +615,9 @@
     <property name="geometry">
      <rect>
       <x>600</x>
-      <y>206</y>
-      <width>51</width>
-      <height>31</height>
+      <y>520</y>
+      <width>47</width>
+      <height>51</height>
      </rect>
     </property>
     <property name="font">
@@ -567,61 +653,7 @@
      <height>21</height>
     </rect>
    </property>
-   <widget class="QMenu" name="menuFile">
-    <property name="title">
-     <string>File</string>
-    </property>
-    <addaction name="actionNew"/>
-    <addaction name="actionExit"/>
-    <addaction name="actionSave"/>
-    <addaction name="actionSave_as"/>
-   </widget>
-   <widget class="QMenu" name="menuEdit">
-    <property name="title">
-     <string>Edit</string>
-    </property>
-   </widget>
-   <widget class="QMenu" name="menuTools">
-    <property name="title">
-     <string>Tools</string>
-    </property>
-   </widget>
-   <widget class="QMenu" name="menuHelp">
-    <property name="title">
-     <string>Help</string>
-    </property>
-    <addaction name="actionAbout"/>
-   </widget>
-   <addaction name="menuFile"/>
-   <addaction name="menuEdit"/>
-   <addaction name="menuTools"/>
-   <addaction name="menuHelp"/>
   </widget>
-  <action name="actionNew">
-   <property name="text">
-    <string>New</string>
-   </property>
-  </action>
-  <action name="actionExit">
-   <property name="text">
-    <string>Load</string>
-   </property>
-  </action>
-  <action name="actionSave">
-   <property name="text">
-    <string>Save</string>
-   </property>
-  </action>
-  <action name="actionSave_as">
-   <property name="text">
-    <string>Save as</string>
-   </property>
-  </action>
-  <action name="actionAbout">
-   <property name="text">
-    <string>About</string>
-   </property>
-  </action>
  </widget>
  <resources/>
  <connections/>
