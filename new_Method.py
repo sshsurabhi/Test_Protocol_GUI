@@ -1,4 +1,5 @@
-import sys, serial, datetime, time
+import sys, serial, datetime, time, os, openpyxl
+import pandas as pd
 from PyQt5 import uic
 from PyQt5.QtWidgets import *
 from PyQt5.QtGui import *
@@ -377,6 +378,68 @@ class App(QMainWindow):
             self.powersupply.write('OUTPut CH1,ON')
         else:
             self.textBrowser.append('Wrong Input')
+##########################################################################################################            
+    def Load_Excel(self):
+        file_dialog = QFileDialog(self)        # Open file dialog to select an Excel sheet
+        file_dialog.setNameFilter("Excel Files (*.xlsx *.xls)")
+        file_dialog.setFileMode(QFileDialog.ExistingFile)
+        if file_dialog.exec():
+            selected_files = file_dialog.selectedFiles()
+            file_path = selected_files[0]
+        else:
+            return
+        try:
+            excel_data = pd.read_excel(file_path)        # Load the selected Excel sheet
+        except pd.errors.EmptyDataError:
+            QMessageBox.warning(self, "Empty Sheet", "The selected Excel sheet is empty.")
+            return
+        except Exception as e:
+            QMessageBox.warning(self, "Error", f"An error occurred while loading the Excel sheet:\n{str(e)}")
+            return
+        self.text_browser.clear()        # Display the data in the text browser
+        self.text_browser.append("Loaded Excel Data:" + '\n')
+        self.text_browser.append(excel_data.to_string())
+                                                                                                ###############################################################################
+    def Save_Excel(self):
+        port = self.com_ports_combo.currentText()        # Get data from form fields
+        baud = self.baud_rates_combo.currentText()
+        DC_Vals = self.DC_AC_Values[0][1]
+        AC_Vals = self.DC_AC_Values[1][2]
+
+        name, ok = QInputDialog.getText(self, "Save Data", "Enter a name:")        # Ask the user for the name using a popup dialog
+        if not ok:
+            return
+        workbook_name = "mydata.xlsx"        # Open or create Excel workbook and worksheet
+        if os.path.exists(workbook_name):
+            workbook = openpyxl.load_workbook(workbook_name)
+        else:
+            workbook = openpyxl.Workbook()
+        worksheet = workbook.active
+        name_exists = False        # Check if name already exists in the sheet
+        for row in worksheet.iter_rows(values_only=True):
+            if name == row[0]:
+                name_exists = True
+                break
+        if name_exists:
+            reply = QMessageBox.question(
+                self, "Name already exists",
+                f"{name} already exists. Do you want to save with a different name?",
+                QMessageBox.Yes | QMessageBox.No)
+            if reply == QMessageBox.Yes:
+                new_name, ok = QInputDialog.getText(self, "Save Data", "Enter a different name:")                # Ask the user for a different name using a popup dialog
+                if not ok:
+                    return
+                name = new_name
+        data = [name, port, baud, DC_Vals, AC_Vals]        # Add data to sheet  # Add more data here
+        worksheet.append(data)
+        workbook.save(workbook_name)        # Save the workbook
+        # Optionally, you can open the saved workbook in an external application
+        # subprocess.run(["open", workbook_name])
+#####################################################################################################################################################################################
+    def on_widget_button_clicked(self, message):
+        self.text_browser.append(message)
+
+
 
 def main():
     app = QApplication(sys.argv)
