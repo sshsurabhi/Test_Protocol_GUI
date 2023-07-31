@@ -125,6 +125,7 @@ class App(QMainWindow):
                 self.textBrowser.append(self.multimeter.read())
                 self.on_button_click('images_/PP7_3.png')
                 self.start_button.setText('SPANNUNG')
+                self.powersupply.write('OUTPut '+self.PS_channel+',ON')
                 self.info_label.setText('Press SPANNUNG button and Check the Information')
             except visa.errors.VisaIOError:
                 self.textBrowser.append('Multimeter has not been presented')
@@ -244,7 +245,6 @@ class App(QMainWindow):
         elif self.start_button.text()== 'MULTI ON':
             self.connect_multimeter()
         elif self.start_button.text()== 'SPANNUNG':
-            self.powersupply.write('OUTPut '+self.PS_channel+',ON')
             self.textBrowser.append(self.powersupply.query('MEASure:CURRent? '+self.PS_channel))
             self.info_label.setText('Press STROM button')
             self.on_button_click('images_/PP7_4.png')
@@ -264,12 +264,12 @@ class App(QMainWindow):
     def mess_with_multimeter(self):
         if self.AC_DC_box.currentText() == 'DCV':
             print(self.multimeter)
-            result = self.multimeter.query('MEAS:VOLT:DC?')
-            self.textBrowser.append(result)
+            result = float(self.multimeter.query('MEAS:VOLT:DC?'))
+            self.textBrowser.append(str(result))
             return result
         elif self.AC_DC_box.currentText()== 'ACV':
-            result = self.multimeter.query('MEAS:VOLT:AC?')
-            self.textBrowser.append(result)
+            result = float(self.multimeter.query('MEAS:VOLT:AC?'))
+            self.textBrowser.append(str(result))
             return result
 
 
@@ -299,10 +299,15 @@ class App(QMainWindow):
     def on_cal_voltage_current(self):
         if self.AC_DC_box.currentText() == 'DCV' and self.test_button.text() == 'GO':
             self.multimeter.query('*IDN?')
-            self.info_label.setText('Press R709')
-            
+            self.info_label.setText('Press R709')          
+
         elif self.AC_DC_box.currentText() == 'DCV' and self.test_button.text() == 'R709':
-            self.result_edit.setText(self.mess_with_multimeter())
+            voltage = self.mess_with_multimeter()
+            if 3.28 <= voltage <= 3.38:
+                self.result_edit.setText(voltage)
+            else:
+                self.result_edit.setText(voltage)
+                QMessageBox.information(self, "Status", "Voltage is diferred"+str(voltage))
             self.test_button.setText('R700')
 
         elif self.AC_DC_box.currentText() == 'DCV' and self.test_button.text() == 'R700':
@@ -313,7 +318,16 @@ class App(QMainWindow):
             QMessageBox.information(self, "Information", "Select ACV in the box near AC/DC")
 
         elif self.AC_DC_box.currentText() == 'ACV' and self.test_button.text() == 'R709':
-            self.result_edit.setText(self.multimeter.query('MEAS:VOLT:AC?'))
+            self.result_edit.setText(self.mess_with_multimeter())
+            self.test_button.setText('R700')
+
+        elif self.AC_DC_box.currentText() == 'ACV' and self.test_button.text() == 'R700':
+            self.result_edit.setText(self.mess_with_multimeter())
+            self.test_button.setEnabled(False)
+            self.AC_DC_box.setEnabled(True)
+            self.info_label.setText('Select ACV in AC DC Box')
+            QMessageBox.information(self, "Information", "Select ACV in the box near AC/DC")
+
 
     def update_time_label(self):
         current_time = QTime.currentTime().toString(Qt.DefaultLocaleLongDate)
