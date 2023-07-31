@@ -65,7 +65,7 @@ class App(QMainWindow):
     def __init__(self):
         super(App, self).__init__()
         uic.loadUi("UI/ascha.ui", self)
-        self.setWindowIcon(QIcon('2.jpg'))
+        self.setWindowIcon(QIcon('images_/2.jpg'))
         self.setFixedSize(self.size())
         self.show()
 #############################################################################################################################################################
@@ -120,8 +120,8 @@ class App(QMainWindow):
         if not self.multimeter:
             try:
                 self.multimeter = self.rm.open_resource('TCPIP0::192.168.222.207::5024::SOCKET')
-                self.multimeter.read_termination = ' '
-                self.multimeter.write_termination = ' '
+                self.multimeter.read_termination = '\n'
+                self.multimeter.write_termination = '\n'
                 self.textBrowser.append(self.multimeter.read())
                 self.on_button_click('images_/PP7_3.png')
                 self.start_button.setText('SPANNUNG')
@@ -137,11 +137,11 @@ class App(QMainWindow):
         if not self.powersupply:
             try:
                 self.powersupply = self.rm.open_resource('TCPIP0::192.168.222.141::INSTR')
-                self.powersupply.read_termination = ' '
-                self.powersupply.write_termination = ' '
+                self.powersupply.read_termination = '\n'
+                self.powersupply.write_termination = '\n'
                 self.textBrowser.setText(self.powersupply.resource_name)
                 self.start_button.setEnabled(False)
-                self.info_label.setText('Type CH1 in the box next to CH and Press ENTER  \n Check the given Voltage is set or not..!')
+                self.info_label.setText('\n \n \n \n \n \n Type CH1 in the box next to CH and Press ENTER')
                 self.value_edit.setEnabled(True)
                 self.vals_button.setText('CH')
                 self.on_button_click('images_/PP7.png')
@@ -196,6 +196,16 @@ class App(QMainWindow):
                 else:
                     self.on_button_click('images_/3.jpg')
 
+            if self.start_button.text() == 'JUMPER CK':
+                reply = self.jumper_close()
+                if reply == QMessageBox.Yes:
+                    self.start_button.setText('MULTI ON')
+                    self.start_button.setEnabled(True)
+                    self.on_button_click('images_/PP16.png')
+                    self.info_label.setText('Press MULTI ON button')
+                else:
+                    self.on_button_click('images_/PP17.png')
+
     def show_good_message(self):
         msgBox = QMessageBox()
         msgBox.setIcon(QMessageBox.Question)
@@ -225,25 +235,22 @@ class App(QMainWindow):
             self.start_button.setText("Step4")
         elif self.start_button.text()=='Step4':
             self.on_button_click('images_/3.jpg')
-
         elif self.start_button.text()== 'Netzteil ON':
             self.connect_powersupply()
         elif self.start_button.text() == 'MESS V_I':
             self.calc_voltage_before_jumper()
+        elif self.start_button.text() == 'JUMPER CK':
+            self.on_button_click('images_/Power_ON_PS.jpg')
         elif self.start_button.text()== 'MULTI ON':
             self.connect_multimeter()
         elif self.start_button.text()== 'SPANNUNG':
-            self.textBrowser.append(self.powersupply.query(self.PS_channel+':VOLTage?'))
+            self.powersupply.write('OUTPut '+self.PS_channel+',ON')
+            self.textBrowser.append(self.powersupply.query('MEASure:CURRent? '+self.PS_channel))
             self.info_label.setText('Press STROM button')
             self.on_button_click('images_/PP7_4.png')
             self.start_button.setText('STROM')
         elif self.start_button.text()== 'STROM':
-            self.textBrowser.append(self.powersupply.query(self.PS_channel+':CURRent?'))
-            self.start_button.setEnabled(False)
-            self.AC_DC_box.setEnabled(True)
-            self.test_button.setEnabled(True)
-            self.on_button_click('images_/MM_DCV.png')
-            QMessageBox.information(self, "Information", "Select DCV in the box near AC/DC")
+            self.calc_voltage_before_jumper()
         elif (self.start_button.text()== 'Messung' and self.AC_DC_box.text == 'DCV'):
             self.mess_with_multimeter()
             self.start_button.setText('Messung')
@@ -256,10 +263,13 @@ class App(QMainWindow):
 
     def mess_with_multimeter(self):
         if self.AC_DC_box.currentText() == 'DCV':
+            print(self.multimeter)
             result = self.multimeter.query('MEAS:VOLT:DC?')
+            self.textBrowser.append(result)
             return result
         elif self.AC_DC_box.currentText()== 'ACV':
             result = self.multimeter.query('MEAS:VOLT:AC?')
+            self.textBrowser.append(result)
             return result
 
 
@@ -267,6 +277,7 @@ class App(QMainWindow):
         if text == 'DCV':
             self.selected_command = 'MEAS:VOLT:DC?'
             self.test_button.setEnabled(True)
+            self.powersupply.write('OUTPut '+self.PS_channel+',ON')
             self.on_button_click('images_/PP9.png')
             self.test_button.setText('R709')
             self.info_label.setText('Press R709')
@@ -292,13 +303,10 @@ class App(QMainWindow):
             
         elif self.AC_DC_box.currentText() == 'DCV' and self.test_button.text() == 'R709':
             self.result_edit.setText(self.mess_with_multimeter())
-            self.textBrowser.setText(self.mess_with_multimeter())
             self.test_button.setText('R700')
 
         elif self.AC_DC_box.currentText() == 'DCV' and self.test_button.text() == 'R700':
-            print(self.mess_with_multimeter)
             self.result_edit.setText(self.mess_with_multimeter())
-            self.textBrowser.setText(self.mess_with_multimeter())
             self.test_button.setEnabled(False)
             self.AC_DC_box.setEnabled(True)
             self.info_label.setText('Select ACV in AC DC Box')
@@ -399,7 +407,7 @@ class App(QMainWindow):
             print(self.powersupply.query(self.PS_channel+':CURRent?'))
             self.vals_button.setText('Tolz V')
             self.info_label.setText('Enter 0.05 in the box next to I')
-            self.powersupply.write('OUTPut CH1,ON')
+            self.powersupply.write('OUTPut '+self.PS_channel+',ON')
             self.value_edit.clear()
             self.on_button_click('images_/PP8.png')
 
@@ -424,18 +432,38 @@ class App(QMainWindow):
     def calc_voltage_before_jumper(self):
         voltage = float(self.powersupply.query('MEASure:VOLTage? '+self.PS_channel))
         current = float(self.powersupply.query('MEASure:CURRent? '+self.PS_channel))
-        if 0.4 <= current <= 0.6:
-            self.result_edit.setText('Current: '+current)
-            self.textBrowser.append('Volatge: '+voltage+', Current: '+current)
-            self.start_button.setText('MULTI ON')
-            self.info_labe.setText('Press MULTI ON')
-        else:
-            QMessageBox.information(self, 'Information', 'Supplying Current is either more or less. So please Swith OFF the PowerSupply, and Put back all the Euipment back.')
-            self.result_edit.setText('Current: '+str(current))
-            self.textBrowser.append('Volatge: '+str(voltage)+', Current: '+str(current))
-            self.powersupply.write('OUTPut CH1,OFF')
-            self.start_button.setText('MULTI ON')
-            self.info_label.setText('Press MULTI ON')
+        self.result_edit.setText('Current: '+str(current))
+        self.textBrowser.append('Volatge: '+str(voltage)+', Current: '+str(current))
+        if self.start_button.text() == 'MESS V_I':
+            if 0.04 <= current <= 0.06:
+                self.start_button.setText('JUMPER CK')
+                self.start_button.setEnabled(False)
+            else:
+                QMessageBox.information(self, 'Information', 'Supplying Current is either more or less. So please Swith OFF the PowerSupply, and Put back all the Euipment back.')
+                self.powersupply.write('OUTPut '+self.PS_channel+',OFF')
+                self.start_button.setText('JUMPER CK')
+                self.start_button.setEnabled(False)
+                self.info_label.setText('Close the JUMPER')
+                self.on_button_click('images_/Power_ON_PS.jpg')
+        elif self.start_button.text() == 'STROM':
+            if 0.09 <= current <= 0.15:
+                self.start_button.setEnabled(False)
+                self.AC_DC_box.setEnabled(True)
+                self.test_button.setEnabled(True)
+                self.on_button_click('images_/MM_DCV.png')
+                QMessageBox.information(self, "Information", "Select DCV in the box near AC/DC")
+            else:
+                QMessageBox.information(self, 'Information', 'Supplying Current is either more or less. So please Swith OFF the PowerSupply, and Put back all the Euipment back.')
+                self.powersupply.write('OUTPut '+self.PS_channel+',OFF')
+                
+    def jumper_close(self):
+        msgBox = QMessageBox()
+        msgBox.setIcon(QMessageBox.Question)
+        msgBox.setText("Close the Jumper Before proceed further. If closed the Press Yes")
+        msgBox.setWindowTitle("IMPORTANT!")
+        msgBox.setStandardButtons(QMessageBox.Yes | QMessageBox.No)
+        return msgBox.exec_()
+
 ##########################################################################################################            
     def Load_Excel(self):
         file_dialog = QFileDialog(self)        # Open file dialog to select an Excel sheet
