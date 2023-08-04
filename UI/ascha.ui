@@ -1,20 +1,23 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <ui version="4.0">
- <class>MainWindow</class>
- <widget class="QMainWindow" name="MainWindow">
+ <class>APP</class>
+ <widget class="QMainWindow" name="APP">
   <property name="geometry">
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>1549</width>
-    <height>859</height>
+    <width>1545</width>
+    <height>855</height>
    </rect>
   </property>
   <property name="windowTitle">
    <string>MainWindow</string>
   </property>
+  <property name="toolTip">
+   <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;&lt;span style=&quot; font-weight:600;&quot;&gt;Moewe Optik Gmbh, Mittweida. 2023&lt;/span&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+  </property>
   <property name="styleSheet">
-   <string notr="true">background-color: rgb(59, 143, 140);</string>
+   <string notr="true">background-color: rgb(120, 55, 0);</string>
   </property>
   <widget class="QWidget" name="centralwidget">
    <widget class="QLabel" name="image_label">
@@ -92,7 +95,7 @@
      </font>
     </property>
     <property name="text">
-     <string>Netzteil ON</string>
+     <string>START</string>
     </property>
     <property name="checkable">
      <bool>false</bool>
@@ -366,16 +369,16 @@
     <property name="geometry">
      <rect>
       <x>10</x>
-      <y>400</y>
-      <width>331</width>
-      <height>364</height>
+      <y>603</y>
+      <width>761</width>
+      <height>161</height>
      </rect>
     </property>
     <property name="frameShape">
      <enum>QFrame::Panel</enum>
     </property>
     <property name="lineWidth">
-     <number>3</number>
+     <number>1</number>
     </property>
    </widget>
    <widget class="QPushButton" name="test_button">
@@ -537,27 +540,43 @@ background-color: rgb(85, 85, 85);</string>
    <widget class="QTextBrowser" name="info_label">
     <property name="geometry">
      <rect>
-      <x>340</x>
+      <x>5</x>
       <y>400</y>
-      <width>431</width>
-      <height>364</height>
+      <width>771</width>
+      <height>201</height>
      </rect>
+    </property>
+    <property name="sizePolicy">
+     <sizepolicy hsizetype="Expanding" vsizetype="Expanding">
+      <horstretch>0</horstretch>
+      <verstretch>5</verstretch>
+     </sizepolicy>
     </property>
     <property name="font">
      <font>
-      <pointsize>14</pointsize>
+      <pointsize>10</pointsize>
       <weight>75</weight>
       <bold>true</bold>
+      <underline>true</underline>
      </font>
     </property>
+    <property name="focusPolicy">
+     <enum>Qt::WheelFocus</enum>
+    </property>
     <property name="frameShape">
-     <enum>QFrame::WinPanel</enum>
+     <enum>QFrame::Panel</enum>
+    </property>
+    <property name="frameShadow">
+     <enum>QFrame::Raised</enum>
     </property>
     <property name="lineWidth">
-     <number>3</number>
+     <number>2</number>
     </property>
     <property name="midLineWidth">
-     <number>1</number>
+     <number>2</number>
+    </property>
+    <property name="openExternalLinks">
+     <bool>true</bool>
     </property>
    </widget>
   </widget>
@@ -567,7 +586,7 @@ background-color: rgb(85, 85, 85);</string>
     <rect>
      <x>0</x>
      <y>0</y>
-     <width>1549</width>
+     <width>1545</width>
      <height>21</height>
     </rect>
    </property>
@@ -627,6 +646,8 @@ background-color: rgb(85, 85, 85);</string>
    </property>
   </action>
  </widget>
- <resources/>
+ <resources>
+  <include location="../images_/source.qrc"/>
+ </resources>
  <connections/>
 </ui>
