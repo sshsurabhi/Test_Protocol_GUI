@@ -255,7 +255,7 @@ class App(QMainWindow):
             self.info_label.setText('Press STROM button')
             self.on_button_click('images_/images/PP7_4.jpg')
             self.start_button.setText('STROM')
-            self.textBrowser.append(('PowerSUpply'+self.powersupply.query('MEASure:VOLTage? '+self.PS_channel)+'V'))
+            self.textBrowser.append(('PowerSUpply \n'+self.powersupply.query('MEASure:VOLTage? '+self.PS_channel)+'V'))
 
         elif self.start_button.text()== 'STROM':
             self.calc_voltage_before_jumper()
@@ -287,7 +287,7 @@ class App(QMainWindow):
         if text == 'DCV':
             self.selected_command = 'MEAS:VOLT:DC?'
             self.test_button.setEnabled(True)
-            self.on_button_click('images_/images/PP9.jpg')
+            self.on_button_click('images_/images/R709_DC.jpg')
             self.test_button.setText('R709')
             self.info_label.setText('\n\n\n\n Press R709')
             self.AC_DC_box.setEnabled(False)
@@ -478,13 +478,13 @@ class App(QMainWindow):
                 self.start_button.setText('JUMPER CK')
                 self.start_button.setEnabled(False)
                 self.info_label.setText('Close the JUMPER')
-                self.on_button_click('images_/Power_ON_PS.jpg')
+                self.on_button_click('images_/images/close_jumper.jpg')
         elif self.start_button.text() == 'STROM':
             if 0.09 <= current <= 0.15:
                 self.start_button.setEnabled(False)
                 self.AC_DC_box.setEnabled(True)
                 self.test_button.setEnabled(True)
-                self.on_button_click('images_/MM_DCV.png')
+                self.on_button_click('images_/images/sel_DC_in_multimeter.jpg')
                 QMessageBox.information(self, "Information", "Select DCV in the box near AC/DC")
                 self.info_label.setText('\n \n \n \n Select DCV from AC/DC..!')
             else:

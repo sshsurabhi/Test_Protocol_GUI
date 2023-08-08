@@ -95,7 +95,7 @@
      </font>
     </property>
     <property name="text">
-     <string>START</string>
+     <string>Netzteil ON</string>
     </property>
     <property name="checkable">
      <bool>false</bool>
