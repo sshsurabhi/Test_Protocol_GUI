@@ -75,6 +75,7 @@ class App(QMainWindow):
         self.setStatusTip('Moewe Optik Gmbh. 2023')
         self.show()
 #############################################################################################################################################################
+
         self.serial_port = None
         self.thread = None
         self.serial_thread = SerialPortThread()
@@ -86,20 +87,21 @@ class App(QMainWindow):
         self.refresh_button.clicked.connect(self.refresh_connect)
 ###################################################################################################
         self.start_button.clicked.connect(self.connect)
-        self.timer = QTimer(self)
-        self.timer.timeout.connect(self.update_time_label)
-        self.timer.start(1000) 
+        # self.timer = QTimer(self)
+        # self.timer.timeout.connect(self.update_time_label)
+        # self.timer.start(1000) 
         self.rm = visa.ResourceManager()
         self.multimeter = None
         self.powersupply = None
         self.AC_DC_box.addItems(['<select>', 'DCV', 'ACV'])
         self.AC_DC_box.currentTextChanged.connect(self.handleSelectionChange)
         self.test_button.clicked.connect(self.on_cal_voltage_current)
+
+
+
+
         self.DC_values = []
         self.AC_values = []
-
-
-
         self.PS_channel = None
         self.max_voltage = 0
         self.max_current = 0
@@ -121,7 +123,7 @@ class App(QMainWindow):
             try:
                 self.multimeter = self.rm.open_resource('TCPIP0::192.168.222.207::INSTR')
                 self.textBrowser.append(self.multimeter.query('*IDN?'))
-                self.on_button_click('images_/images/PP7_3.png')
+                self.on_button_click('images_/images/PP7_3.jpg')
                 self.start_button.setText('SPANNUNG')
                 self.powersupply.write('OUTPut '+self.PS_channel+',ON')
                 self.info_label.setText('Press SPANNUNG button and Check the Information')
@@ -138,10 +140,10 @@ class App(QMainWindow):
                 self.powersupply = self.rm.open_resource('TCPIP0::192.168.222.141::INSTR')
                 self.textBrowser.setText(self.powersupply.resource_name)
                 self.start_button.setEnabled(False)
-                self.info_label.setText('Type CH1 in the box next to CH and Press ENTER')
+                self.info_label.setText('write CH1 in the box next to CH and Press ENTER')
                 self.value_edit.setEnabled(True)
                 self.vals_button.setText('CH')
-                self.on_button_click('images_/images/PP7.png')
+                self.on_button_click('images_/images/PP7.jpg')
             except visa.errors.VisaIOError:
                 QMessageBox.information(self, "PowerSupply Connection", "PowerSupply is not present at the given IP Address.")
                 self.textBrowser.setText('Powersupply has not been presented.')
@@ -158,6 +160,7 @@ class App(QMainWindow):
         msgBox.setText("Welcome to the testing world.")
         msgBox.setInformativeText("Press OK if you are ready.")
         msgBox.setWindowTitle("Message")
+        self.on_button_click('images_/images/PP11.png')
         msgBox.setStandardButtons(QMessageBox.Ok)
         self.info_label.setText('  Press START Button  ')
         # msgBox.exec_()
@@ -168,11 +171,11 @@ class App(QMainWindow):
     def secondMessage(self):
         msgBox = QMessageBox()
         msgBox.setWindowIcon(QIcon('images_/icons/icon.png'))
-        msgBox.setText("Set all the environment as shown in the image. Read the information carefully everytime.")
+        msgBox.setText("Press the PowerON buttons of PowerSupply and Multimeter to avoid delay.\n\nSet all the environment as shown in the image.\n\nRead the information carefully everytime.\n")
         msgBox.setInformativeText("Then press the button.")
         msgBox.setWindowTitle("Message")
         msgBox.setStandardButtons(QMessageBox.Ok)
-        self.on_button_click('images_/images/PP3.png')
+        self.on_button_click('images_/images/PP1.jpg')
         self.title_label.setText('Preparation Test')
         self.info_label.setText('Press START Button')
         msgBox.exec_()
@@ -184,24 +187,26 @@ class App(QMainWindow):
             self.image_label.setScaledContents(True)
             self.image_label.setFixedSize(pixmap.width(), pixmap.height())
 
-            if self.start_button.text() == 'Step4':
-                reply = self.show_good_message()
-                if reply == QMessageBox.Yes:
+            if self.start_button.text() == 'STEP4':
+                reply = self.show_good_message()                
+                if reply == QMessageBox.Yes:                    
                     self.start_button.setText('Netzteil ON')
-                    self.on_button_click('images_/Power_ON_PS.jpg')
+                    self.on_button_click('images_/images/img4.jpg')
                     self.info_label.setText('Press Netzteil ON button')
+                    
                 else:
                     self.on_button_click('images_/icons/3.jpg')
+
 
             if self.start_button.text() == 'JUMPER CK':
                 reply = self.jumper_close()
                 if reply == QMessageBox.Yes:
                     self.start_button.setText('MULTI ON')
                     self.start_button.setEnabled(True)
-                    self.on_button_click('images_/images/PP16.png')
+                    self.on_button_click('images_/images/PP16.jpg')
                     self.info_label.setText('Press MULTI ON button')
                 else:
-                    self.on_button_click('images_/images/PP17.png')
+                    self.on_button_click('images_/images/PP17.jpg')
 
     def show_good_message(self):
         msgBox = QMessageBox()
@@ -210,43 +215,51 @@ class App(QMainWindow):
         msgBox.setWindowTitle("Congratulations!")
         self.title_label.setText('Powersupply Test')
         msgBox.setStandardButtons(QMessageBox.Yes | QMessageBox.No)
+        
         return msgBox.exec_()
 
 
     def connect(self):
         if self.start_button.text() == 'START':
-            self.on_button_click('images_/images/PP4.png')
-            self.info_label.setText("Place the board on ESD Matte\nSee the Image on the right.\nCheck all your environment with the image.\nCheck All connections.Please close if anything\nnot correct. If correct, press step1 Button.")
-            self.start_button.setText("Step1")
-        elif self.start_button.text() == 'Step1':
-            self.on_button_click('images_/images/PP5.png')
-            self.info_label.setText('Check all the "4" screws are fitted\naccording to the image.If not then\nplease fit 4x "M2,5x5" Torx and M 2.5 Screws\non X200 & X300 please press the button Step2.')
-            self.start_button.setText("Step2")
-        elif self.start_button.text() == 'Step2':
-            self.on_button_click('images_/images/PP4.png')
+            self.on_button_click('images_/images/PP4.jpg')
+            self.info_label.setText("Place the board on ESD Matte See the Image on the right.\n \n Check all your environment with the image. Check All connections.\n \n Please close if anything not correct. If correct, press step1 Button.")
+            self.start_button.setText("STEP1")
+        elif self.start_button.text() == 'STEP1':
+            self.on_button_click('images_/images/PP4_.jpg')
+            self.info_label.setText('Check all the "4" screws are fitted according to the image.\n\n If not then please fit 4x "M2,5x5" Torx and M 2.5 Screws on X200 & X300 please press the button Step2.')
+            self.start_button.setText("STEP2")
+        elif self.start_button.text() == 'STEP2':
+            self.on_button_click('images_/images/PP4.jpg')
             self.info_label.setText('Place back the Board on ESD Matte.')
-            self.start_button.setText("Step3")
-        elif self.start_button.text()=='Step3':
-            self.on_button_click('images_/images/PP6.png')
-            self.info_label.setText('Connect the other Cable to the board.\nas shown in the Image on the right.')
-            self.start_button.setText("Step4")
-        elif self.start_button.text()=='Step4':
-            self.on_button_click('images_/icons/3.jpg')
+            self.start_button.setText("STEP3")
+        elif self.start_button.text()=='STEP3':
+            self.on_button_click('images_/images/PP6.jpg')
+            self.info_label.setText('Connect the other Cable to the board. as shown in the Image on the right.')
+            self.start_button.setText("STEP4")
+        elif self.start_button.text()=='STEP4':
+            self.on_button_click('images_/icons/2.jpg')
+
         elif self.start_button.text()== 'Netzteil ON':
             self.connect_powersupply()
+
         elif self.start_button.text() == 'MESS V_I':
             self.calc_voltage_before_jumper()
+
         elif self.start_button.text() == 'JUMPER CK':
             self.on_button_click('images_/Power_ON_PS.jpg')
+
         elif self.start_button.text()== 'MULTI ON':
             self.connect_multimeter()
+
         elif self.start_button.text()== 'SPANNUNG':
-            self.textBrowser.append(self.powersupply.query('MEASure:CURRent? '+self.PS_channel))
             self.info_label.setText('Press STROM button')
-            self.on_button_click('images_/images/PP7_4.png')
+            self.on_button_click('images_/images/PP7_4.jpg')
             self.start_button.setText('STROM')
+            self.textBrowser.append(('PowerSUpply'+self.powersupply.query('MEASure:VOLTage? '+self.PS_channel)+'V'))
+
         elif self.start_button.text()== 'STROM':
             self.calc_voltage_before_jumper()
+
         elif (self.start_button.text()== 'Messung' and self.AC_DC_box.text == 'DCV'):
             self.mess_with_multimeter()
             self.start_button.setText('Messung')
@@ -274,18 +287,16 @@ class App(QMainWindow):
         if text == 'DCV':
             self.selected_command = 'MEAS:VOLT:DC?'
             self.test_button.setEnabled(True)
-            self.powersupply.write('OUTPut '+self.PS_channel+',ON')
-            self.on_button_click('images_/images/PP9.png')
+            self.on_button_click('images_/images/PP9.jpg')
             self.test_button.setText('R709')
-            self.info_label.setText('Press R709')
-            self.AC_DC_box.setEnabled(False)  # Disable AC_DC_box after selecting 'DCV'
+            self.info_label.setText('\n\n\n\n Press R709')
+            self.AC_DC_box.setEnabled(False)
 
         elif text == 'ACV':
             self.selected_command = 'MEAS:VOLT:AC?'
             self.test_button.setEnabled(True)
-            self.test_button.setText('GO')
             self.on_button_click('images_/pop.png')
-            self.AC_DC_box.setEnabled(False)  # Enable AC_DC_box after selecting 'ACV'
+            self.AC_DC_box.setEnabled(False)
             self.test_button.setText('R709')
             self.info_label.setText('Press R709 nutton.\ncheck voltage at R709 component \nshown in the picture.')
         else:
@@ -299,7 +310,7 @@ class App(QMainWindow):
 
         if self.AC_DC_box.currentText() == 'DCV' and self.test_button.text() == 'GO':
             self.multimeter.query('*IDN?')
-            self.info_label.setText('Press R709')          
+            self.info_label.setText('See the Component in the Image and\n\n\n check the voltage at the same component.')          
 
         elif self.AC_DC_box.currentText() == 'DCV' and self.test_button.text() == 'R709':
             if 3.28 <= float(ret_volt) <= 3.38:
@@ -316,7 +327,7 @@ class App(QMainWindow):
                 QMessageBox.information(self, "Status", "Voltage is diferred"+str(ret_volt))
             self.test_button.setEnabled(False)
             self.AC_DC_box.setEnabled(True)
-            self.info_label.setText('Select ACV in AC DC Box')
+            self.info_label.setText('Change the selection in AC/DC Box. \n\n\n Now we have to calculate AC Voltage at the last two components... \n\n\n So, Select ACV in AC/DC Box')
             QMessageBox.information(self, "Information", "Select ACV in the box near AC/DC")
 
         elif self.AC_DC_box.currentText() == 'ACV' and self.test_button.text() == 'R709':
@@ -395,7 +406,7 @@ class App(QMainWindow):
             self.vals_button.setText('V')
             self.info_label.setText('Write 30 in the box next to V')
             self.value_edit.clear()
-            self.on_button_click('images_/images/PP7_1.png')
+            self.on_button_click('images_/images/PP7_1.jpg')
             self.value_edit.setValidator(QRegExpValidator(QRegExp(r'^\d+(\.\d+)?$')))
 
         elif (self.vals_button.text() == 'CH' and self.value_edit.text() in ['ch2', 'CH2', 'Ch2', 'cH2']):
@@ -404,7 +415,7 @@ class App(QMainWindow):
             self.vals_button.setText('V')
             self.info_label.setText('Enter 30 in the box next to V')
             self.value_edit.clear()
-            self.on_button_click('images_/images/PP7_1.png')
+            self.on_button_click('images_/images/PP7_1.jpg')
             self.value_edit.setValidator(QRegExpValidator(QRegExp(r'^\d+(\.\d+)?$')))
 
         elif (self.vals_button.text() == 'CH' and self.value_edit.text() in ['ch3', 'CH3', 'Ch3', 'cH3']):
@@ -413,7 +424,7 @@ class App(QMainWindow):
             self.vals_button.setText('V')
             self.info_label.setText('Enter 30 in the box next to V')
             self.value_edit.clear()
-            self.on_button_click('images_/images/PP7_1.png')
+            self.on_button_click('images_/images/PP7_1.jpg')
             self.value_edit.setValidator(QRegExpValidator(QRegExp(r'^\d+(\.\d+)?$')))
 
         elif self.vals_button.text() == 'V':
@@ -422,7 +433,7 @@ class App(QMainWindow):
             self.vals_button.setText('I')
             self.info_label.setText('Enter 0.5 in the box next to I')
             self.value_edit.clear()
-            self.on_button_click('images_/images/PP7_2.png')
+            self.on_button_click('images_/images/PP7_2.jpg')
 
         elif self.vals_button.text() == 'I':
             self.powersupply.write('CH1:CURRent ' + str(float(self.value_edit.text())))
@@ -431,15 +442,15 @@ class App(QMainWindow):
             self.info_label.setText('Enter 0.05 in the box next to I')
             self.powersupply.write('OUTPut '+self.PS_channel+',ON')
             self.value_edit.clear()
-            self.on_button_click('images_/images/PP8.png')
+            self.on_button_click('images_/images/PP8.jpg')
 
         elif self.vals_button.text() == 'Tolz V':
             self.volt_toleranz = self.value_edit.text()
             self.textBrowser.append(self.volt_toleranz)
             self.value_edit.clear()
-            self.info_label.setText('Enter 0.03 in the box next to I')
+            self.info_label.setText('Enter 0.5 in the box next to I')
             self.vals_button.setText('Tolz I')
-            self.on_button_click('images_/images/PP8_1.png')
+            self.on_button_click('images_/images/PP8_1.jpg')
 
         elif self.vals_button.text() == 'Tolz I':
             self.curr_toleranz = self.value_edit.text()
@@ -448,7 +459,7 @@ class App(QMainWindow):
             self.start_button.setEnabled(True)
             self.info_label.setText('Press MESS V_I')
             self.start_button.setText('MESS V_I')
-            self.on_button_click('images_/images/PP17.png')
+            self.on_button_click('images_/images/PP17.jpg')
         else:
             self.textBrowser.append('Wrong Input')
     
@@ -550,7 +561,8 @@ class App(QMainWindow):
         if not self.powersupply is None:
             try:
                 response = self.powersupply.query(f"OUTP? CH{self.PS_channel}")
-                if response.strip()=='ON':
+                print(response)
+                if not response == None:
                     self.powersupply.write('OUTPut '+self.PS_channel+',OFF')
                 else:
                     pass
@@ -611,7 +623,7 @@ class App(QMainWindow):
                 if not ok:
                     return
                 name = new_name
-        data = [name, port, baud, DC_Vals, AC_Vals]        # Add data to sheet  # Add more data here
+        data = [name, port, baud]#, DC_Vals, AC_Vals]        # Add data to sheet  # Add more data here
         worksheet.append(data)
         workbook.save(workbook_name)        # Save the workbook
         # Optionally, you can open the saved workbook in an external application
