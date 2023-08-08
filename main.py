@@ -266,7 +266,7 @@ class App(QMainWindow):
             self.mess_with_multimeter()
         elif self.start_button.text()=='Power OFF':
             self.powersupply.write('OUTPut '+self.PS_channel+',OFF')
-            
+
 
         else:
             self.start_button.setText("Start")
@@ -357,13 +357,13 @@ class App(QMainWindow):
         elif self.AC_DC_box.currentText() == 'DCV' and self.test_button.text() == 'C430':
             ret_volt = self.multimeter.query('MEAS:VOLT:DC?')
             if 2.028 <= float(ret_volt) <= 2.068:
-                self.textBrowser.append("DC Voltage at C412:"+ str(ret_volt))
+                self.textBrowser.append("DC Voltage at C430:"+ str(ret_volt))
             else:
                 QMessageBox.information(self, "Status", "Voltage is diferred"+str(ret_volt))
             self.test_button.setText('C443')
             self.test_button.setEnabled(False)
             self.AC_DC_box.setEnabled(True)
-            self.info_lable.setText('\n \n \n \n Select DCV in AC DC Box')
+            self.info_label.setText('\n \n \n \n Select DCV in AC DC Box')
         
         elif self.AC_DC_box.currentText() == 'ACV' and self.test_button.text() == 'C443':
             ret_volt = self.multimeter.query('MEAS:VOLT:AC?')
