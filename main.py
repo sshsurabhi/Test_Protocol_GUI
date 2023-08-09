@@ -228,11 +228,11 @@ class App(QMainWindow):
             self.info_label.setText('Check all the "4" screws are fitted according to the image.\n\n If not then please fit 4x "M2,5x5" Torx and M 2.5 Screws on X200 & X300 please press the button Step2.')
             self.start_button.setText("STEP2")
         elif self.start_button.text() == 'STEP2':
-            self.on_button_click('images_/images/PP4.jpg')
+            self.on_button_click('images_/images/board_on_mat.jpg')
             self.info_label.setText('Place back the Board on ESD Matte.')
             self.start_button.setText("STEP3")
         elif self.start_button.text()=='STEP3':
-            self.on_button_click('images_/images/PP6.jpg')
+            self.on_button_click('images_/images/board_with_cabels.jpg')
             self.info_label.setText('Connect the other Cable to the board. as shown in the Image on the right.')
             self.start_button.setText("STEP4")
         elif self.start_button.text()=='STEP4':
@@ -266,8 +266,7 @@ class App(QMainWindow):
             self.mess_with_multimeter()
         elif self.start_button.text()=='Power OFF':
             self.powersupply.write('OUTPut '+self.PS_channel+',OFF')
-
-
+            self.start_b
         else:
             self.start_button.setText("Start")
             self.textBrowser.append('disconnected')
@@ -280,6 +279,7 @@ class App(QMainWindow):
             self.info_label.setText('See the Component in the Image and\n\n\n check the voltage at the same component.')
             self.textBrowser.append(str(ret_volt))
             self.test_button.setText('R709')
+            self.on_button_click('images_/images/R709.jpg')
         
         elif self.AC_DC_box.currentText() == 'DCV' and self.test_button.text() == 'R709':
             ret_volt = self.multimeter.query('MEAS:VOLT:DC?')
@@ -288,6 +288,7 @@ class App(QMainWindow):
             else:
                 QMessageBox.information(self, "Status", "Voltage is diferred"+str(ret_volt))
             self.test_button.setText('R700')
+            self.on_button_click('images_/images/R700.jpg')
 
         elif self.AC_DC_box.currentText() == 'DCV' and self.test_button.text() == 'R700':
             ret_volt = self.multimeter.query('MEAS:VOLT:DC?')
@@ -298,6 +299,7 @@ class App(QMainWindow):
             self.test_button.setText('R709')
             self.test_button.setEnabled(False)
             self.AC_DC_box.setEnabled(True)
+            self.on_button_click('images_/images/R709.jpg')
             self.info_label.setText('Change the selection in AC/DC Box. \n\n\n Now we have to calculate AC Voltage at the last two components... \n\n\n So, Select ACV in AC/DC Box')
             QMessageBox.information(self, "Information", "Select ACV in the box near AC/DC")
 
@@ -309,6 +311,7 @@ class App(QMainWindow):
             else:
                 QMessageBox.information(self, "Status", "Voltage is diferred"+str(ret_volt))
             self.test_button.setText('R700')
+            self.on_button_click('images_/images/R709.jpg')
 
         elif self.AC_DC_box.currentText() == 'ACV' and self.test_button.text() == 'R700':
             ret_volt = self.multimeter.query('MEAS:VOLT:AC?')
@@ -321,6 +324,7 @@ class App(QMainWindow):
             self.info_label.setText('Select DCV in AC DC Box')
             QMessageBox.information(self, "Information", "Select DCV in the box near AC/DC")
             self.test_button.setText('C443')
+            self.on_button_click('images_/images/C443.jpg')
 
         elif self.AC_DC_box.currentText() == 'DCV' and self.test_button.text() == 'C443':
             ret_volt = self.multimeter.query('MEAS:VOLT:DC?')
@@ -329,6 +333,7 @@ class App(QMainWindow):
             else:
                 QMessageBox.information(self, "Status", "Voltage is diferred"+str(ret_volt))
             self.test_button.setText('C442')
+            self.on_button_click('images_/images/C442.jpg')
 
         elif self.AC_DC_box.currentText() == 'DCV' and self.test_button.text() == 'C442':
             ret_volt = self.multimeter.query('MEAS:VOLT:DC?')
@@ -337,6 +342,7 @@ class App(QMainWindow):
             else:
                 QMessageBox.information(self, "Status", "Voltage is diferred"+str(ret_volt))
             self.test_button.setText('C441')
+            self.on_button_click('images_/images/C441.jpg')
 
         elif self.AC_DC_box.currentText() == 'DCV' and self.test_button.text() == 'C441':
             ret_volt = self.multimeter.query('MEAS:VOLT:DC?')
@@ -345,6 +351,7 @@ class App(QMainWindow):
             else:
                 QMessageBox.information(self, "Status", "Voltage is diferred"+str(ret_volt))
             self.test_button.setText('C412')
+            self.on_button_click('images_/images/C412.jpg')
 
         elif self.AC_DC_box.currentText() == 'DCV' and self.test_button.text() == 'C412':
             ret_volt = self.multimeter.query('MEAS:VOLT:DC?')
@@ -353,6 +360,7 @@ class App(QMainWindow):
             else:
                 QMessageBox.information(self, "Status", "Voltage is diferred"+str(ret_volt))
             self.test_button.setText('C430')
+            self.on_button_click('images_/images/C430.jpg')
 
         elif self.AC_DC_box.currentText() == 'DCV' and self.test_button.text() == 'C430':
             ret_volt = self.multimeter.query('MEAS:VOLT:DC?')
@@ -361,6 +369,7 @@ class App(QMainWindow):
             else:
                 QMessageBox.information(self, "Status", "Voltage is diferred"+str(ret_volt))
             self.test_button.setText('C443')
+            self.on_button_click('images_/images/C443.jpg')
             self.test_button.setEnabled(False)
             self.AC_DC_box.setEnabled(True)
             self.info_label.setText('\n \n \n \n Select DCV in AC DC Box')
@@ -372,6 +381,7 @@ class App(QMainWindow):
             else:
                 QMessageBox.information(self, "Status", "Voltage is diferred"+str(ret_volt))
             self.test_button.setText('C442')
+            self.on_button_click('images_/images/C442.jpg')
 
         elif self.AC_DC_box.currentText() == 'ACV' and self.test_button.text() == 'C442':
             ret_volt = self.multimeter.query('MEAS:VOLT:AC?')
@@ -380,6 +390,7 @@ class App(QMainWindow):
             else:
                 QMessageBox.information(self, "Status", "Voltage is diferred"+str(ret_volt))
             self.test_button.setText('C441')
+            self.on_button_click('images_/images/C441.jpg')
 
         elif self.AC_DC_box.currentText() == 'ACV' and self.test_button.text() == 'C441':
             ret_volt = self.multimeter.query('MEAS:VOLT:AC?')
@@ -388,6 +399,7 @@ class App(QMainWindow):
             else:
                 QMessageBox.information(self, "Status", "Voltage is diferred"+str(ret_volt))
             self.test_button.setText('C412')
+            self.on_button_click('images_/images/C412.jpg')
 
         elif self.AC_DC_box.currentText() == 'ACV' and self.test_button.text() == 'C412':
             ret_volt = self.multimeter.query('MEAS:VOLT:AC?')
@@ -396,6 +408,7 @@ class App(QMainWindow):
             else:
                 QMessageBox.information(self, "Status", "Voltage is diferred"+str(ret_volt))
             self.test_button.setText('C430')
+            self.on_button_click('images_/images/C430.jpg')
 
         elif self.AC_DC_box.currentText() == 'ACV' and self.test_button.text() == 'C412':
             ret_volt = self.multimeter.query('MEAS:VOLT:AC?')
@@ -407,7 +420,10 @@ class App(QMainWindow):
             self.info_lable.setText('\n \n \n \n SWITCH OFF the POWERSUPPLY and Assemble SDIO board, spacers and screws')
             self.start_button.setEnabled(True)
             self.start_button.setText('Power OFF')
+            self.on_button_click('images_/images/img8.jpg')
             QMessageBox.information(self, "Status", "Assemble SDIO board, spacers and screws")
+        else:
+            QMessageBox.information(self, "Status", "Wrong Testing")
 
 
 
