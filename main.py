@@ -114,6 +114,7 @@ class App(QMainWindow):
         self.connect_button.setEnabled(False)
         self.refresh_button.setEnabled(False)
         self.version_edit.setEnabled(False)
+        self.result_edit.setEnabled(False)
         self.firstMessage()
 ##########################################################################################################################################################
 
@@ -139,6 +140,7 @@ class App(QMainWindow):
                 self.powersupply = self.rm.open_resource('TCPIP0::192.168.222.141::INSTR')
                 self.textBrowser.setText(self.powersupply.resource_name)
                 self.start_button.setEnabled(False)
+                self.value_edit.setStyleSheet("background-color: yellow;")
                 self.info_label.setText('write CH1 in the box next to CH and Press ENTER')
                 self.value_edit.setEnabled(True)
                 self.vals_button.setText('CH')
@@ -265,8 +267,39 @@ class App(QMainWindow):
         elif self.start_button.text()== 'Messung':
             self.mess_with_multimeter()
         elif self.start_button.text()=='Power OFF':
-            self.powersupply.write('OUTPut '+self.PS_channel+',OFF')
-            self.start_b
+            self.info_label.setText('Switch OFF both PowerSupply & Multimeter.')
+            self.on_button_click('images_/images/Start2.png')
+            QMessageBox.information(self, "Important", "Read and watch the image clearly and do the process carefully.\n Press 'OFF ALL' button")
+            self.start_button.setText('OFF ALL')
+        elif self.start_button.text()=='OFF ALL':
+            self.info_label.setText('Take FPGA Module and do as shown in the figure. Do all necessary things. \n then Press FPGA')
+            self.on_button_click('images_/images/FPGA_.jpg')
+            QMessageBox.information(self, "Important", "Read and watch the image clearly and do the process carefully.")
+            self.start_button.setText('FPGA')
+        elif self.start_button.text()=='FPGA':
+            self.info_label.setText('FIX FPGA Module to the board as shown.\The Press JETZT button')
+            self.on_button_click('images_/images/FPGA_2.jpg')
+            QMessageBox.information(self, "Important", "Read and watch the image clearly and do the process carefully.")
+            self.start_button.setText('JETZT')     
+        elif self.start_button.text()=='JETZT':
+            self.powersupply.write('OUTPut '+self.PS_channel+',ON')
+            self.multimeter.query('*IDN?')
+            self.info_label.setText('Switch ON Powersupply, and Multimeter')
+            self.on_button_click('images_/images/board_with_cabels.jpg')
+            QMessageBox.information(self, "Important", "Read and watch the image clearly and do the process carefully.")
+            self.start_button.setText('MESS AN')
+        elif self.start_button.text()=='MESS AN':
+            self.info_label.setText('Switch ON Powersupply, and Multimeter and wait 510 seconds.\Then press SERIAL TEST button')
+            self.on_button_click('images_/images/Start2.png')
+            QMessageBox.information(self, "Important", "Read and watch the image clearly and do the process carefully.")
+            self.start_button.setText('SERIAL TEST')
+        elif self.start_button.text()=='SERIAL TEST':
+            self.info_label.setText('Wait 10 seconds ')
+            self.on_button_click('images_/images/Start2.png')
+            self.connect_button.setEnabled(True)
+            self.port_box.setEnabled(True)
+            self.baudrate_box.setEnabled(True)
+            QMessageBox.information(self, "Important", "Read and watch the image clearly and do the process carefully.")
         else:
             self.start_button.setText("Start")
             self.textBrowser.append('disconnected')
@@ -285,8 +318,13 @@ class App(QMainWindow):
             ret_volt = self.multimeter.query('MEAS:VOLT:DC?')
             if 3.28 <= float(ret_volt) <= 3.38:
                 self.textBrowser.append("DC Voltage at R709:"+ str(ret_volt))
+                self.result_edit.setStyleSheet("background-color: green;")
+                self.result_edit.setText(ret_volt)
             else:
+                self.result_edit.setStyleSheet("background-color: red;")
+                self.result_edit.setText(ret_volt)
                 QMessageBox.information(self, "Status", "Voltage is diferred"+str(ret_volt))
+
             self.test_button.setText('R700')
             self.on_button_click('images_/images/R700.jpg')
 
@@ -294,7 +332,11 @@ class App(QMainWindow):
             ret_volt = self.multimeter.query('MEAS:VOLT:DC?')
             if 4.95 <= float(ret_volt) <= 5.05:
                 self.textBrowser.append("DC Voltage at R700:"+ str(ret_volt))
+                self.result_edit.setStyleSheet("background-color: green;")
+                self.result_edit.setText(ret_volt)
             else:
+                self.result_edit.setStyleSheet("background-color: red;")
+                self.result_edit.setText(ret_volt)
                 QMessageBox.information(self, "Status", "Voltage is diferred"+str(ret_volt))
             self.test_button.setText('R709')
             self.test_button.setEnabled(False)
@@ -308,7 +350,11 @@ class App(QMainWindow):
             ret_volt = self.multimeter.query('MEAS:VOLT:AC?')
             if float(ret_volt) <= 0.01:
                 self.textBrowser.append("AC Voltage at R709:"+ str(ret_volt))
+                self.result_edit.setStyleSheet("background-color: green;")
+                self.result_edit.setText(ret_volt)
             else:
+                self.result_edit.setStyleSheet("background-color: red;")
+                self.result_edit.setText(ret_volt)
                 QMessageBox.information(self, "Status", "Voltage is diferred"+str(ret_volt))
             self.test_button.setText('R700')
             self.on_button_click('images_/images/R709.jpg')
@@ -317,7 +363,11 @@ class App(QMainWindow):
             ret_volt = self.multimeter.query('MEAS:VOLT:AC?')
             if float(ret_volt) <= 0.01:
                 self.textBrowser.append("AC Voltage at R700:"+ str(ret_volt))
+                self.result_edit.setStyleSheet("background-color: green;")
+                self.result_edit.setText(ret_volt)
             else:
+                self.result_edit.setStyleSheet("background-color: red;")
+                self.result_edit.setText(ret_volt)
                 QMessageBox.information(self, "Status", "Voltage is diferred"+str(ret_volt))
             self.test_button.setEnabled(False)
             self.AC_DC_box.setEnabled(True)
@@ -330,7 +380,11 @@ class App(QMainWindow):
             ret_volt = self.multimeter.query('MEAS:VOLT:DC?')
             if 11.95 <= float(ret_volt) <= 12.05:
                 self.textBrowser.append("DC Voltage at C443:"+ str(ret_volt))
+                self.result_edit.setStyleSheet("background-color: green;")
+                self.result_edit.setText(ret_volt)
             else:
+                self.result_edit.setStyleSheet("background-color: red;")
+                self.result_edit.setText(ret_volt)
                 QMessageBox.information(self, "Status", "Voltage is diferred"+str(ret_volt))
             self.test_button.setText('C442')
             self.on_button_click('images_/images/C442.jpg')
@@ -339,7 +393,11 @@ class App(QMainWindow):
             ret_volt = self.multimeter.query('MEAS:VOLT:DC?')
             if 4.95 <= float(ret_volt) <= 5.05:
                 self.textBrowser.append("DC Voltage at C442:"+ str(ret_volt))
+                self.result_edit.setStyleSheet("background-color: green;")
+                self.result_edit.setText(ret_volt)
             else:
+                self.result_edit.setStyleSheet("background-color: red;")
+                self.result_edit.setText(ret_volt)
                 QMessageBox.information(self, "Status", "Voltage is diferred"+str(ret_volt))
             self.test_button.setText('C441')
             self.on_button_click('images_/images/C441.jpg')
@@ -348,7 +406,11 @@ class App(QMainWindow):
             ret_volt = self.multimeter.query('MEAS:VOLT:DC?')
             if 4.95 <= float(ret_volt) <= 5.05:
                 self.textBrowser.append("DC Voltage at C441:"+ str(ret_volt))
+                self.result_edit.setStyleSheet("background-color: green;")
+                self.result_edit.setText(ret_volt)
             else:
+                self.result_edit.setStyleSheet("background-color: red;")
+                self.result_edit.setText(ret_volt)
                 QMessageBox.information(self, "Status", "Voltage is diferred"+str(ret_volt))
             self.test_button.setText('C412')
             self.on_button_click('images_/images/C412.jpg')
@@ -357,7 +419,11 @@ class App(QMainWindow):
             ret_volt = self.multimeter.query('MEAS:VOLT:DC?')
             if 4.98 <= float(ret_volt) <= 5.02:
                 self.textBrowser.append("DC Voltage at C412:"+ str(ret_volt))
+                self.result_edit.setStyleSheet("background-color: green;")
+                self.result_edit.setText(ret_volt)
             else:
+                self.result_edit.setStyleSheet("background-color: red;")
+                self.result_edit.setText(ret_volt)
                 QMessageBox.information(self, "Status", "Voltage is diferred"+str(ret_volt))
             self.test_button.setText('C430')
             self.on_button_click('images_/images/C430.jpg')
@@ -366,7 +432,11 @@ class App(QMainWindow):
             ret_volt = self.multimeter.query('MEAS:VOLT:DC?')
             if 2.028 <= float(ret_volt) <= 2.068:
                 self.textBrowser.append("DC Voltage at C430:"+ str(ret_volt))
+                self.result_edit.setStyleSheet("background-color: green;")
+                self.result_edit.setText(ret_volt)
             else:
+                self.result_edit.setStyleSheet("background-color: red;")
+                self.result_edit.setText(ret_volt)
                 QMessageBox.information(self, "Status", "Voltage is diferred"+str(ret_volt))
             self.test_button.setText('C443')
             self.on_button_click('images_/images/C443.jpg')
@@ -378,7 +448,11 @@ class App(QMainWindow):
             ret_volt = self.multimeter.query('MEAS:VOLT:AC?')
             if float(ret_volt) < 0.01:
                 self.textBrowser.append("DC Voltage at C443:"+ str(ret_volt))
+                self.result_edit.setStyleSheet("background-color: green;")
+                self.result_edit.setText(ret_volt)
             else:
+                self.result_edit.setStyleSheet("background-color: red;")
+                self.result_edit.setText(ret_volt)
                 QMessageBox.information(self, "Status", "Voltage is diferred"+str(ret_volt))
             self.test_button.setText('C442')
             self.on_button_click('images_/images/C442.jpg')
@@ -388,6 +462,8 @@ class App(QMainWindow):
             if float(ret_volt) < 0.05:
                 self.textBrowser.append("DC Voltage at C442:"+ str(ret_volt))
             else:
+                self.result_edit.setStyleSheet("background-color: red;")
+                self.result_edit.setText(ret_volt)
                 QMessageBox.information(self, "Status", "Voltage is diferred"+str(ret_volt))
             self.test_button.setText('C441')
             self.on_button_click('images_/images/C441.jpg')
@@ -396,7 +472,11 @@ class App(QMainWindow):
             ret_volt = self.multimeter.query('MEAS:VOLT:AC?')
             if float(ret_volt) < 0.05:
                 self.textBrowser.append("DC Voltage at C441:"+ str(ret_volt))
+                self.result_edit.setStyleSheet("background-color: green;")
+                self.result_edit.setText(ret_volt)
             else:
+                self.result_edit.setStyleSheet("background-color: red;")
+                self.result_edit.setText(ret_volt)
                 QMessageBox.information(self, "Status", "Voltage is diferred"+str(ret_volt))
             self.test_button.setText('C412')
             self.on_button_click('images_/images/C412.jpg')
@@ -405,19 +485,27 @@ class App(QMainWindow):
             ret_volt = self.multimeter.query('MEAS:VOLT:AC?')
             if float(ret_volt) < 0.001:
                 self.textBrowser.append("DC Voltage at C412:"+ str(ret_volt))
+                self.result_edit.setStyleSheet("background-color: green;")
+                self.result_edit.setText(ret_volt)
             else:
+                self.result_edit.setStyleSheet("background-color: red;")
+                self.result_edit.setText(ret_volt)
                 QMessageBox.information(self, "Status", "Voltage is diferred"+str(ret_volt))
             self.test_button.setText('C430')
             self.on_button_click('images_/images/C430.jpg')
 
-        elif self.AC_DC_box.currentText() == 'ACV' and self.test_button.text() == 'C412':
+        elif self.AC_DC_box.currentText() == 'ACV' and self.test_button.text() == 'C430':
             ret_volt = self.multimeter.query('MEAS:VOLT:AC?')
             if float(ret_volt) < 0.001:
                 self.textBrowser.append("DC Voltage at C412:"+ str(ret_volt))
+                self.result_edit.setStyleSheet("background-color: green;")
+                self.result_edit.setText(ret_volt)
             else:
+                self.result_edit.setStyleSheet("background-color: red;")
+                self.result_edit.setText(ret_volt)
                 QMessageBox.information(self, "Status", "Voltage is diferred"+str(ret_volt))
             self.test_button.setEnabled(False)
-            self.info_lable.setText('\n \n \n \n SWITCH OFF the POWERSUPPLY and Assemble SDIO board, spacers and screws')
+            self.info_label.setText('\n \n \n \n SWITCH OFF the POWERSUPPLY and Assemble SDIO board, spacers and screws')
             self.start_button.setEnabled(True)
             self.start_button.setText('Power OFF')
             self.on_button_click('images_/images/img8.jpg')
@@ -425,29 +513,9 @@ class App(QMainWindow):
         else:
             QMessageBox.information(self, "Status", "Wrong Testing")
 
-
-
-
-
     def selct_AC_DC_box(self):
         self.test_button.setEnabled(True)
         self.AC_DC_box.setEnabled(False)
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
     def update_time_label(self):
         current_time = QTime.currentTime().toString(Qt.DefaultLocaleLongDate)
@@ -457,7 +525,6 @@ class App(QMainWindow):
     def update_com_ports(self, com_ports):
         self.port_box.clear()
         self.port_box.addItems(com_ports)
-
 
     def connect_or_disconnect_serial_port(self):
         if self.serial_port is None:
@@ -539,28 +606,34 @@ class App(QMainWindow):
         elif self.vals_button.text() == 'I':
             self.powersupply.write('CH1:CURRent ' + str(float(self.value_edit.text())))
             self.textBrowser.append(self.powersupply.query(self.PS_channel+':CURRent?'))
+
             self.vals_button.setText('Tolz V')
             self.info_label.setText('Enter 0.05 in the box next to I')
             self.powersupply.write('OUTPut '+self.PS_channel+',ON')
-            self.value_edit.clear()
-            self.on_button_click('images_/images/PP8.jpg')
-
-        elif self.vals_button.text() == 'Tolz V':
-            self.volt_toleranz = self.value_edit.text()
-            self.textBrowser.append(self.volt_toleranz)
-            self.value_edit.clear()
-            self.info_label.setText('Enter 0.5 in the box next to I')
-            self.vals_button.setText('Tolz I')
-            self.on_button_click('images_/images/PP8_1.jpg')
-
-        elif self.vals_button.text() == 'Tolz I':
-            self.curr_toleranz = self.value_edit.text()
-            self.textBrowser.append(self.curr_toleranz)
             self.value_edit.setEnabled(False)
             self.start_button.setEnabled(True)
             self.info_label.setText('Press MESS V_I')
             self.start_button.setText('MESS V_I')
-            self.on_button_click('images_/images/PP17.jpg')
+            self.value_edit.setStyleSheet("")
+            self.value_edit.clear()
+            self.on_button_click('images_/images/PP8.jpg')
+
+        # elif self.vals_button.text() == 'Tolz V':
+        #     self.volt_toleranz = self.value_edit.text()
+        #     self.textBrowser.append(self.volt_toleranz)
+        #     self.value_edit.clear()
+        #     self.info_label.setText('Enter 0.5 in the box next to I')
+        #     self.vals_button.setText('Tolz I')
+        #     self.on_button_click('images_/images/PP8_1.jpg')
+
+        # elif self.vals_button.text() == 'Tolz I':
+        #     self.curr_toleranz = self.value_edit.text()
+        #     self.textBrowser.append(self.curr_toleranz)
+        #     self.value_edit.setEnabled(False)
+        #     self.start_button.setEnabled(True)
+        #     self.info_label.setText('Press MESS V_I')
+        #     self.start_button.setText('MESS V_I')
+        #     self.on_button_click('images_/images/PP17.jpg')
         else:
             self.textBrowser.append('Wrong Input')
     

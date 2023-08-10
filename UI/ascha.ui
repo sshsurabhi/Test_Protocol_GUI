@@ -14,7 +14,7 @@
    <string>MainWindow</string>
   </property>
   <property name="toolTip">
-   <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;&lt;span style=&quot; font-weight:600;&quot;&gt;Moewe Optik Gmbh, Mittweida. 2023&lt;/span&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+   <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;&lt;br/&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
   </property>
   <property name="styleSheet">
    <string notr="true">background-color: rgb(79, 79, 79);</string>
@@ -28,6 +28,10 @@
       <width>761</width>
       <height>751</height>
      </rect>
+    </property>
+    <property name="styleSheet">
+     <string notr="true">border-color: rgb(0, 0, 0);
+selection-color: rgb(0, 85, 255);</string>
     </property>
     <property name="frameShape">
      <enum>QFrame::Box</enum>
@@ -133,7 +137,7 @@
       </font>
      </property>
      <property name="text">
-      <string>START</string>
+      <string>Netzteil ON</string>
      </property>
      <property name="checkable">
       <bool>false</bool>
@@ -203,8 +207,10 @@
      </property>
      <property name="styleSheet">
       <string notr="true">selection-background-color: rgb(115, 140, 140);
+background-color: rgb(219, 255, 120);
 color: rgb(255, 255, 127);
-background-color: rgb(85, 85, 85);</string>
+background-color: rgb(85, 85, 85);
+</string>
      </property>
      <property name="inputMask">
       <string notr="true"/>
@@ -224,6 +230,7 @@ background-color: rgb(85, 85, 85);</string>
      </property>
      <property name="font">
       <font>
+       <pointsize>10</pointsize>
        <weight>75</weight>
        <bold>true</bold>
       </font>
@@ -255,6 +262,7 @@ background-color: rgb(85, 85, 85);</string>
      </property>
      <property name="font">
       <font>
+       <pointsize>10</pointsize>
        <weight>75</weight>
        <bold>true</bold>
       </font>
@@ -303,6 +311,13 @@ background-color: rgb(85, 85, 85);</string>
        <width>131</width>
        <height>41</height>
       </rect>
+     </property>
+     <property name="font">
+      <font>
+       <pointsize>10</pointsize>
+       <weight>75</weight>
+       <bold>true</bold>
+      </font>
      </property>
     </widget>
     <widget class="QLabel" name="label">
@@ -358,7 +373,14 @@ background-color: rgb(85, 85, 85);</string>
        <pointsize>12</pointsize>
        <weight>75</weight>
        <bold>true</bold>
+       <underline>true</underline>
       </font>
+     </property>
+     <property name="mouseTracking">
+      <bool>true</bool>
+     </property>
+     <property name="frameShape">
+      <enum>QFrame::StyledPanel</enum>
      </property>
      <property name="text">
       <string/>

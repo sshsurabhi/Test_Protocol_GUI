@@ -1,41 +1,150 @@
-import sys
-import random
-from PyQt5.QtWidgets import QApplication, QMainWindow, QPushButton, QLineEdit, QVBoxLayout, QWidget
-from PyQt5.QtGui import QColor
+# import configparser
 
-NUMS = [2, 3, 5, 7, 11, 13, 17, 19, 23, 29, 31, 37, 41, 43, 47, 53, 59, 61, 67, 71, 73, 79, 83, 89, 97, 101, 103, 107, 109, 113, 127, 131, 137, 139, 149, 151, 157, 163, 167, 173, 179, 181, 191, 193, 197, 199]
+# def create_config_file():
+#     config = configparser.ConfigParser()
 
-class PrimeNumberChecker(QMainWindow):
-    def __init__(self):
-        super().__init__()
+#     config.add_section('Powersupply Test')
+#     powersupply_values = [
+#         "DCV b/w GND - R709",
+#         "DCV b/w GND - R700",
+#         "ACV b/w GND - R709",
+#         "ACV b/w GND - R700",
+#         "DCV b/w ISOGND - C443",
+#         "DCV b/w ISOGND - C442",
+#         "DCV b/w ISOGND - C441",
+#         "DCV b/w ISOGND - C412",
+#         "DCV 2.048V b/w ISOGND - C430",
+#         "ACV b/w ISOGND - C443",
+#         "ACV b/w ISOGND - C442",
+#         "ACV b/w ISOGND - C441",
+#         "ACV b/w ISOGND - C412"
+#     ]
+#     for value in powersupply_values:
+#         config.set('Powersupply Test', value, '')
 
-        self.setWindowTitle("Prime Number Checker")
-        self.setGeometry(100, 100, 300, 150)
+#     config.add_section('I2C Test')
+#     i2c_values = [
+#         "UID",
+#         "IC704 result registers Reading"
+#     ]
+#     for value in i2c_values:
+#         config.set('I2C Test', value, '')
 
-        layout = QVBoxLayout()
+#     with open('conf_ig.ini', 'w') as configfile:
+#         config.write(configfile)
 
-        self.line_edit = QLineEdit()
-        layout.addWidget(self.line_edit)
+# def update_value_in_section(section, key, new_value):
+#     config = configparser.ConfigParser()
+#     config.read('conf_ig.ini')
 
-        self.start_button = QPushButton("START")
-        self.start_button.clicked.connect(self.start_button_clicked)
-        layout.addWidget(self.start_button)
+#     if config.has_section(section) and config.has_option(section, key):
+#         config.set(section, key, str(new_value))  # Convert float to string
 
-        central_widget = QWidget()
-        central_widget.setLayout(layout)
-        self.setCentralWidget(central_widget)
+#         with open('conf_ig.ini', 'w') as configfile:
+#             config.write(configfile)
 
-    def start_button_clicked(self):
-        random_number = random.randint(1, 1000)
-        self.line_edit.setText(str(random_number))
+# if __name__ == "__main__":
+#     create_config_file()
+#     print("conf_ig.ini file created successfully.")
 
-        if random_number in NUMS:
-            self.line_edit.setStyleSheet("background-color: lightgreen;")
-        else:
-            self.line_edit.setStyleSheet("background-color: red;")
+#     update_value_in_section('Powersupply Test', 'DCV b/w GND - R709', 53.5)
+#     print("Value updated in 'DCV b/w GND - R709' successfully.")
+
+
+# import configparser
+# import openpyxl
+
+# def convert_ini_to_excel(ini_file, excel_file):
+#     config = configparser.ConfigParser()
+#     config.read(ini_file)
+
+#     workbook = openpyxl.Workbook()
+#     for section in config.sections():
+#         worksheet = workbook.create_sheet(title=section)
+#         for key, value in config.items(section):
+#             worksheet.append([key, value])
+
+#     workbook.remove(workbook['Sheet'])  # Remove default sheet
+#     workbook.save(excel_file)
+
+# if __name__ == "__main__":
+#     ini_file = 'conf_ig.ini'
+#     excel_file = 'conf_ig.xlsx'
+
+#     convert_ini_to_excel(ini_file, excel_file)
+#     print(f"INI file '{ini_file}' converted to Excel file '{excel_file}' successfully.")
+
+
+
+
+
+# import configparser
+
+# def print_ini_file(file_path):
+#     config = configparser.ConfigParser()
+#     config.read(file_path)
+
+#     for section in config.sections():
+#         print(f"[{section}]")
+#         for key, value in config.items(section):
+#             print(f"{key} = {value}")
+#         print()
+
+# if __name__ == "__main__":
+#     ini_file = 'conf_ig.ini'
+#     print_ini_file(ini_file)
+
+
+# import configparser
+# import openpyxl
+
+# def convert_ini_to_excel(ini_file, excel_file):
+#     config = configparser.ConfigParser()
+#     config.read(ini_file)
+
+#     workbook = openpyxl.Workbook()
+
+#     for section in config.sections():
+#         worksheet = workbook.create_sheet(title=section)
+#         worksheet.append(["Section", "Key", "Value"])  # Add headers
+
+#         for key, value in config.items(section):
+#             worksheet.append([section, key, value])
+
+#     workbook.remove(workbook['Sheet'])  # Remove default sheet
+#     workbook.save(excel_file)
+
+# if __name__ == "__main__":
+#     ini_file = 'conf_ig.ini'
+#     excel_file = 'conf_ig.xlsx'
+
+#     convert_ini_to_excel(ini_file, excel_file)
+#     print(f"INI file '{ini_file}' converted to Excel file '{excel_file}' successfully.")
+
+
+
+import configparser
+import openpyxl
+
+def convert_ini_to_excel(ini_file, excel_file):
+    config = configparser.ConfigParser()
+    config.read(ini_file)
+
+    workbook = openpyxl.Workbook()
+    worksheet = workbook.active
+    worksheet.title = 'All Sections'
+
+    worksheet.append(["Section", "Key", "Value"])  # Add headers
+
+    for section in config.sections():
+        for key, value in config.items(section):
+            worksheet.append([section, key, value])
+
+    workbook.save(excel_file)
 
 if __name__ == "__main__":
-    app = QApplication(sys.argv)
-    window = PrimeNumberChecker()
-    window.show()
-    sys.exit(app.exec_())
+    ini_file = 'conf_ig.ini'
+    excel_file = 'conf_ig.xlsx'
+
+    convert_ini_to_excel(ini_file, excel_file)
+    print(f"INI file '{ini_file}' converted to Excel file '{excel_file}' successfully.")
