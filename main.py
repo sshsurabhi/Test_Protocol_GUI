@@ -1,9 +1,4 @@
-import datetime
-import os
-import sys
-import time
-
-import openpyxl
+import datetime, os, sys, time, openpyxl, configparser
 import pandas as pd
 import pyvisa as visa
 import serial
@@ -99,8 +94,7 @@ class App(QMainWindow):
         self.test_button.clicked.connect(self.on_cal_voltage_current)
 
 
-        self.DC_values = []
-        self.AC_values = []
+
         self.PS_channel = None
         self.max_voltage = 0
         self.max_current = 0
@@ -117,16 +111,36 @@ class App(QMainWindow):
         self.result_edit.setEnabled(False)
         self.firstMessage()
 ##########################################################################################################################################################
-
+        self.save_button.clicked.connect(self.create_ini_file)
+        self.current_before_jumper = 0
+        self.current_after_jumper = 0
+        self.voltage_before_jumper = 0
+        self.dcv_bw_gnd_n_r709 = 0
+        self.dcv_bw_gnd_n_r700 = 0
+        self.acv_bw_gnd_n_r709 = 0
+        self.acv_bw_gnd_n_r700 = 0
+        self.dcv_bw_gnd_n_c443 = 0
+        self.dcv_bw_gnd_n_c442 = 0
+        self.dcv_bw_gnd_n_c441 = 0
+        self.dcv_bw_gnd_n_c412 = 0
+        self.dcv_bw_gnd_n_c430 = 0
+        self.acv_bw_gnd_n_c443 = 0
+        self.acv_bw_gnd_n_c442 = 0
+        self.acv_bw_gnd_n_c441 = 0
+        self.acv_bw_gnd_n_c412 = 0
+        self.acv_bw_gnd_n_c430 = 0
+        self.uid = 0
+        self.ic704_register_reading = 0
+        ##################################################################################################################################################
     def connect_multimeter(self):
         if not self.multimeter:
             try:
                 self.multimeter = self.rm.open_resource('TCPIP0::192.168.222.207::INSTR')
                 self.textBrowser.append(self.multimeter.query('*IDN?'))
-                self.on_button_click('images_/images/PP7_3.jpg')
+                self.on_button_click('images_/images/R709_before_jumper.jpg')
                 self.start_button.setText('SPANNUNG')
                 self.powersupply.write('OUTPut '+self.PS_channel+',ON')
-                self.info_label.setText('Press SPANNUNG button and Check the Information')
+                self.info_label.setText('CHeck VOLTAGE at the component R709')
             except visa.errors.VisaIOError:
                 self.textBrowser.append('Multimeter has not been presented')
         else:
@@ -202,8 +216,8 @@ class App(QMainWindow):
             if self.start_button.text() == 'JUMPER CK':
                 reply = self.jumper_close()
                 if reply == QMessageBox.Yes:
-                    self.start_button.setText('MULTI ON')
-                    self.start_button.setEnabled(True)
+                    # self.start_button.setText('MULTI ON')
+                    # self.start_button.setEnabled(True)
                     self.on_button_click('images_/images/PP16.jpg')
                     self.info_label.setText('Press MULTI ON button')
                 else:
@@ -215,8 +229,7 @@ class App(QMainWindow):
         msgBox.setText("Good that you have correct Environment. Stage 1 has been Completed. Do you want to continue?")
         msgBox.setWindowTitle("Congratulations!")
         self.title_label.setText('Powersupply Test')
-        msgBox.setStandardButtons(QMessageBox.Yes | QMessageBox.No)
-        
+        msgBox.setStandardButtons(QMessageBox.Yes | QMessageBox.No)        
         return msgBox.exec_()
 
 
@@ -239,28 +252,23 @@ class App(QMainWindow):
             self.start_button.setText("STEP4")
         elif self.start_button.text()=='STEP4':
             self.on_button_click('images_/icons/2.jpg')
-
         elif self.start_button.text()== 'Netzteil ON':
             self.connect_powersupply()
-
         elif self.start_button.text() == 'MESS V_I':
             self.calc_voltage_before_jumper()
-
         elif self.start_button.text() == 'JUMPER CK':
             self.on_button_click('images_/Power_ON_PS.jpg')
-
         elif self.start_button.text()== 'MULTI ON':
             self.connect_multimeter()
-
         elif self.start_button.text()== 'SPANNUNG':
             self.info_label.setText('Press STROM button')
             self.on_button_click('images_/images/PP7_4.jpg')
             self.start_button.setText('STROM')
+            voltage_before_jumper = self.multimeter.query('MEASure:VOLTage:DC?')
+            voltage_before_jumper = self.voltage_before_jumper
             self.textBrowser.append(('PowerSUpply \n'+self.powersupply.query('MEASure:VOLTage? '+self.PS_channel)+'V'))
-
         elif self.start_button.text()== 'STROM':
             self.calc_voltage_before_jumper()
-
         elif (self.start_button.text()== 'Messung' and self.AC_DC_box.text == 'DCV'):
             self.mess_with_multimeter()
             self.start_button.setText('Messung')
@@ -303,8 +311,6 @@ class App(QMainWindow):
         else:
             self.start_button.setText("Start")
             self.textBrowser.append('disconnected')
-
-
 
     def on_cal_voltage_current(self):
         if self.AC_DC_box.currentText() == 'DCV' and self.test_button.text() == 'GO':
@@ -596,24 +602,26 @@ class App(QMainWindow):
             self.value_edit.setValidator(QRegExpValidator(QRegExp(r'^\d+(\.\d+)?$')))
 
         elif self.vals_button.text() == 'V':
-            self.powersupply.write(self.PS_channel+':VOLTage ' + self.value_edit.text())
-            self.textBrowser.append(self.powersupply.query(self.PS_channel+':VOLTage?'))
+            self.max_voltage =  self.value_edit.text()
+            self.powersupply.write(self.PS_channel+':VOLTage ' + self.max_voltage)
+            # self.textBrowser.append(self.powersupply.query(self.PS_channel+':VOLTage?'))
+            max_voltage = self.max_voltage
             self.vals_button.setText('I')
             self.info_label.setText('Enter 0.5 in the box next to I')
             self.value_edit.clear()
             self.on_button_click('images_/images/PP7_2.jpg')
 
         elif self.vals_button.text() == 'I':
-            self.powersupply.write('CH1:CURRent ' + str(float(self.value_edit.text())))
-            self.textBrowser.append(self.powersupply.query(self.PS_channel+':CURRent?'))
+            self.max_current = self.value_edit.text()
+            self.powersupply.write('CH1:CURRent ' + self.max_current)
 
-            self.vals_button.setText('Tolz V')
+            # self.textBrowser.append(self.powersupply.query(self.PS_channel+':CURRent?'))
             self.info_label.setText('Enter 0.05 in the box next to I')
             self.powersupply.write('OUTPut '+self.PS_channel+',ON')
             self.value_edit.setEnabled(False)
             self.start_button.setEnabled(True)
-            self.info_label.setText('Press MESS V_I')
-            self.start_button.setText('MESS V_I')
+            self.info_label.setText('Press MULTI ON') # modify here'
+            self.start_button.setText('MULTI ON')
             self.value_edit.setStyleSheet("")
             self.value_edit.clear()
             self.on_button_click('images_/images/PP8.jpg')
@@ -638,10 +646,9 @@ class App(QMainWindow):
             self.textBrowser.append('Wrong Input')
     
     def calc_voltage_before_jumper(self):
-        voltage = float(self.powersupply.query('MEASure:VOLTage? '+self.PS_channel))
         current = float(self.powersupply.query('MEASure:CURRent? '+self.PS_channel))
         self.result_edit.setText('Current: '+str(current))
-        self.textBrowser.append('Volatge: '+str(voltage)+', Current: '+str(current))
+        self.textBrowser.append('Current: '+str(current))
         if self.start_button.text() == 'MESS V_I':
             if 0.04 <= current <= 0.06:
                 self.start_button.setText('JUMPER CK')
@@ -686,6 +693,48 @@ class App(QMainWindow):
         else:
             pass
         event.accept()
+
+
+    def create_ini_file(self):
+        config = configparser.ConfigParser()
+
+        config.add_section('Powersupply Test')
+        config.add_section('I2C Test')
+        power_supply_values = {
+            "Supply Voltage" : self.max_voltage,
+            "Supply Current" : self.max_current,
+            "current_before_jumper" : self.current_before_jumper,
+            "voltage_before_jumper" : self.voltage_before_jumper,
+            "current_after_jumper" : self.current_after_jumper,
+            "dcv_bw_gnd_n_r709" : self.dcv_bw_gnd_n_r709,
+            "dcv_bw_gnd_n_r700" : self.dcv_bw_gnd_n_r700,
+            "acv_bw_gnd_n_r709" : self.acv_bw_gnd_n_r709,
+            "acv_bw_gnd_n_r700" : self.acv_bw_gnd_n_r700,
+            "dcv_bw_gnd_n_c443" : self.dcv_bw_gnd_n_c443,
+            "dcv_bw_gnd_n_c442" : self.dcv_bw_gnd_n_c442,
+            "dcv_bw_gnd_n_c441" : self.dcv_bw_gnd_n_c441,
+            "dcv_bw_gnd_n_c412" : self.dcv_bw_gnd_n_c412,
+            "dcv_bw_gnd_n_c430" : self.dcv_bw_gnd_n_c430,
+            "acv_bw_gnd_n_c443" : self.acv_bw_gnd_n_c443,
+            "acv_bw_gnd_n_c442" : self.acv_bw_gnd_n_c442,
+            "acv_bw_gnd_n_c441" : self.acv_bw_gnd_n_c441,
+            "acv_bw_gnd_n_c412" : self.acv_bw_gnd_n_c412,
+            "acv_bw_gnd_n_c430" : self.acv_bw_gnd_n_c430
+        }
+        I2C_Values = {
+            "UID" : self.uid,
+            "ic704_register_reading" : self.ic704_register_reading
+        }
+
+        # Loop through the dictionary to set values for each key
+        for key, value in power_supply_values.items():
+            config.set('Powersupply Test', key, str(value))
+
+        for key, value in I2C_Values.items():
+            config.set('I2C Test', key, str(value))
+
+        with open('conf_igg.ini', 'w') as configfile:
+            config.write(configfile)
 
 
 def main():
