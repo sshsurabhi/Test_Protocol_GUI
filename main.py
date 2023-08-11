@@ -81,6 +81,8 @@ class App(QMainWindow):
         self.connect_button.clicked.connect(self.connect_or_disconnect_serial_port)
         self.refresh_button.clicked.connect(self.refresh_connect)
 ###################################################################################################
+        self.commands = ['i2c:scan', 'i2c:read:53:04:FC', 'i2c:write:53:', 'i2c:read:53:20:00', 'i2c:write:73:04', 'i2c:scan','i2c:write:21:0300','i2c:write:21:0100','i2c:write:21:01FF', 'i2c:write:73:01',
+                    'i2c:scan', 'i2c:write:4F:06990918', 'i2c:write:4F:01F8', 'i2c:read:4F:1E:00']
         self.start_button.clicked.connect(self.connect)
         # self.timer = QTimer(self)
         # self.timer.timeout.connect(self.update_time_label)
@@ -297,23 +299,24 @@ class App(QMainWindow):
             QMessageBox.information(self, "Important", "Read and watch the image clearly and do the process carefully.")
             self.start_button.setText('JETZT')     
         elif self.start_button.text()=='JETZT':
-            self.powersupply.write('OUTPut '+self.PS_channel+',ON')
-            self.multimeter.query('*IDN?')
+            # self.powersupply.write('OUTPut '+self.PS_channel+',ON')
+            # self.multimeter.query('*IDN?')
             self.info_label.setText('Switch ON Powersupply, and Multimeter')
             self.on_button_click('images_/images/board_with_cabels.jpg')
             QMessageBox.information(self, "Important", "Read and watch the image clearly and do the process carefully.")
             self.start_button.setText('MESS AN')
+
         elif self.start_button.text()=='MESS AN':
-            self.info_label.setText('Switch ON Powersupply, and Multimeter and wait 510 seconds.\Then press SERIAL TEST button')
+            self.info_label.setText('Switch ON Powersupply, and Multimeter and wait 5 seconds.\Then press SERIAL TEST button')
             self.on_button_click('images_/images/Start2.png')
             QMessageBox.information(self, "Important", "Read and watch the image clearly and do the process carefully.")
-            self.start_button.setText('SERIAL TEST')
+            self.connect_button.setEnabled(True)
+            self.start_button.setEnabled(False)
+
         elif self.start_button.text()=='SERIAL TEST':
+            self.start_process()
             self.info_label.setText('Wait 10 seconds ')
             self.on_button_click('images_/images/Start2.png')
-            self.connect_button.setEnabled(True)
-            self.port_box.setEnabled(True)
-            self.baudrate_box.setEnabled(True)
             QMessageBox.information(self, "Important", "Read and watch the image clearly and do the process carefully.")
         else:
             self.start_button.setText("Start")
@@ -552,6 +555,9 @@ class App(QMainWindow):
             baud_rate = int(self.baudrate_box.currentText())
             self.serial_port = serial.Serial(com_port, baud_rate, timeout=1)            # Create a new serial port object and open it
             self.port_box.setEnabled(False)  # Disable the combo boxes and change the button text
+            self.start_button.setText('SERIAL TEST')
+            self.start_button.setEnabled(True)
+            self.connect_button.setEnabled(True)
             self.baudrate_box.setEnabled(False)
             self.connect_button.setText('Disconnect')
             self.textBrowser.append('Serial Communication Connected')
@@ -570,6 +576,10 @@ class App(QMainWindow):
         self.serial_thread.wait()
         self.serial_thread.start()
 
+    def on_widget_button_clicked(self, message):
+        self.textBrowser.append(message)
+    def update_lineinsert(self, response):
+            self.result_line_insert.setText(response)
     def start_process(self):
         if self.thread is None or not self.thread.isRunning():
             QMessageBox.information(self, "Process Started", "Process has been started.")

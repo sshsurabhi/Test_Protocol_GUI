@@ -140,7 +140,7 @@ selection-color: rgb(0, 85, 255);</string>
       <string notr="true"/>
      </property>
      <property name="text">
-      <string>SERIAL TEST</string>
+      <string>Netzteil ON</string>
      </property>
      <property name="checkable">
       <bool>false</bool>
