@@ -94,9 +94,6 @@ class App(QMainWindow):
         # self.AC_DC_box.currentTextChanged.connect(self.handleSelectionChange)
         self.AC_DC_box.currentTextChanged.connect(self.selct_AC_DC_box)
         self.test_button.clicked.connect(self.on_cal_voltage_current)
-
-
-
         self.PS_channel = None
         self.max_voltage = 0
         self.max_current = 0
@@ -579,7 +576,7 @@ class App(QMainWindow):
     def on_widget_button_clicked(self, message):
         self.textBrowser.append(message)
     def update_lineinsert(self, response):
-            self.result_line_insert.setText(response)
+            self.id_Edit.setText(response)
     def start_process(self):
         if self.thread is None or not self.thread.isRunning():
             QMessageBox.information(self, "Process Started", "Process has been started.")
