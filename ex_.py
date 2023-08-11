@@ -123,28 +123,63 @@
 
 
 
+# import configparser
+# import openpyxl
+
+# def convert_ini_to_excel(ini_file, excel_file):
+#     config = configparser.ConfigParser()
+#     config.read(ini_file)
+
+#     workbook = openpyxl.Workbook()
+#     worksheet = workbook.active
+#     worksheet.title = 'All Sections'
+
+#     worksheet.append(["Section", "Key", "Value"])  # Add headers
+
+#     for section in config.sections():
+#         for key, value in config.items(section):
+#             worksheet.append([section, key, value])
+
+#     workbook.save(excel_file)
+
+# if __name__ == "__main__":
+#     ini_file = 'conf_ig.ini'
+#     excel_file = 'conf_ig.xlsx'
+
+#     convert_ini_to_excel(ini_file, excel_file)
+#     print(f"INI file '{ini_file}' converted to Excel file '{excel_file}' successfully.")
+
+
 import configparser
-import openpyxl
-
-def convert_ini_to_excel(ini_file, excel_file):
+X = 25
+Y = 54
+YX = 75
+XY = 857
+def create_ini_file():
     config = configparser.ConfigParser()
-    config.read(ini_file)
 
-    workbook = openpyxl.Workbook()
-    worksheet = workbook.active
-    worksheet.title = 'All Sections'
+    config.add_section('Powersupply Test')
+    powersupply_values = {
+        "DCV b/w GND - R709" : X,
+        "DCV b/w GND - R700" : Y,
+        "ACV b/w GND - R709" : XY,
+        "ACV b/w GND - R700" : YX
+    }
+    # Loop through the dictionary to set values for each key
+    for key, value in powersupply_values.items():
+        config.set('Powersupply Test', key, str(value))
 
-    worksheet.append(["Section", "Key", "Value"])  # Add headers
+    config.add_section('I2C Test')
+    i2c_values = [
+        "UID",
+        "IC704 result registers Reading"
+    ]
+    for value in i2c_values:
+        config.set('I2C Test', value, '')
 
-    for section in config.sections():
-        for key, value in config.items(section):
-            worksheet.append([section, key, value])
-
-    workbook.save(excel_file)
+    with open('conf_igg.ini', 'w') as configfile:
+        config.write(configfile)
 
 if __name__ == "__main__":
-    ini_file = 'conf_ig.ini'
-    excel_file = 'conf_ig.xlsx'
-
-    convert_ini_to_excel(ini_file, excel_file)
-    print(f"INI file '{ini_file}' converted to Excel file '{excel_file}' successfully.")
+    create_ini_file()
+    print("conf_ig.ini file created successfully.")

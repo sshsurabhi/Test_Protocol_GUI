@@ -136,8 +136,11 @@ selection-color: rgb(0, 85, 255);</string>
        <bold>true</bold>
       </font>
      </property>
+     <property name="styleSheet">
+      <string notr="true"/>
+     </property>
      <property name="text">
-      <string>Netzteil ON</string>
+      <string>SERIAL TEST</string>
      </property>
      <property name="checkable">
       <bool>false</bool>
@@ -159,6 +162,9 @@ selection-color: rgb(0, 85, 255);</string>
        <bold>true</bold>
       </font>
      </property>
+     <property name="styleSheet">
+      <string notr="true"/>
+     </property>
      <property name="text">
       <string>GO</string>
      </property>
@@ -178,6 +184,9 @@ selection-color: rgb(0, 85, 255);</string>
        <weight>75</weight>
        <bold>true</bold>
       </font>
+     </property>
+     <property name="styleSheet">
+      <string notr="true">alternate-background-color: rgb(80, 80, 60);</string>
      </property>
      <property name="alignment">
       <set>Qt::AlignCenter</set>
@@ -206,11 +215,7 @@ selection-color: rgb(0, 85, 255);</string>
       </font>
      </property>
      <property name="styleSheet">
-      <string notr="true">selection-background-color: rgb(115, 140, 140);
-background-color: rgb(219, 255, 120);
-color: rgb(255, 255, 127);
-background-color: rgb(85, 85, 85);
-</string>
+      <string notr="true"/>
      </property>
      <property name="inputMask">
       <string notr="true"/>
@@ -415,11 +420,14 @@ background-color: rgb(85, 85, 85);
        <bold>true</bold>
       </font>
      </property>
+     <property name="styleSheet">
+      <string notr="true"/>
+     </property>
      <property name="text">
       <string>Refresh</string>
      </property>
      <property name="checkable">
-      <bool>true</bool>
+      <bool>false</bool>
      </property>
     </widget>
     <widget class="QPushButton" name="connect_button">
@@ -438,11 +446,14 @@ background-color: rgb(85, 85, 85);
        <bold>true</bold>
       </font>
      </property>
+     <property name="styleSheet">
+      <string notr="true"/>
+     </property>
      <property name="text">
       <string>Connect</string>
      </property>
      <property name="checkable">
-      <bool>true</bool>
+      <bool>false</bool>
      </property>
     </widget>
     <widget class="QLabel" name="port_label">
@@ -609,6 +620,32 @@ background-color: rgb(85, 85, 85);
      </property>
      <property name="lineWidth">
       <number>1</number>
+     </property>
+    </widget>
+    <widget class="QPushButton" name="save_button">
+     <property name="geometry">
+      <rect>
+       <x>580</x>
+       <y>0</y>
+       <width>131</width>
+       <height>95</height>
+      </rect>
+     </property>
+     <property name="font">
+      <font>
+       <pointsize>14</pointsize>
+       <weight>75</weight>
+       <bold>true</bold>
+      </font>
+     </property>
+     <property name="styleSheet">
+      <string notr="true"/>
+     </property>
+     <property name="text">
+      <string>SAVE</string>
+     </property>
+     <property name="checkable">
+      <bool>false</bool>
      </property>
     </widget>
    </widget>

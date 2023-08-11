@@ -139,7 +139,6 @@ class App(QMainWindow):
                 self.textBrowser.append(self.multimeter.query('*IDN?'))
                 self.on_button_click('images_/images/R709_before_jumper.jpg')
                 self.start_button.setText('SPANNUNG')
-                self.powersupply.write('OUTPut '+self.PS_channel+',ON')
                 self.info_label.setText('CHeck VOLTAGE at the component R709')
             except visa.errors.VisaIOError:
                 self.textBrowser.append('Multimeter has not been presented')
@@ -216,10 +215,11 @@ class App(QMainWindow):
             if self.start_button.text() == 'JUMPER CK':
                 reply = self.jumper_close()
                 if reply == QMessageBox.Yes:
-                    # self.start_button.setText('MULTI ON')
-                    # self.start_button.setEnabled(True)
+                    self.start_button.setText('STROM')
+                    self.start_button.setEnabled(True)
+                    self.powersupply.write('OUTPut '+self.PS_channel+',ON')
                     self.on_button_click('images_/images/PP16.jpg')
-                    self.info_label.setText('Press MULTI ON button')
+                    self.info_label.setText('Press STROM button')
                 else:
                     self.on_button_click('images_/images/PP17.jpg')
 
@@ -254,19 +254,26 @@ class App(QMainWindow):
             self.on_button_click('images_/icons/2.jpg')
         elif self.start_button.text()== 'Netzteil ON':
             self.connect_powersupply()
-        elif self.start_button.text() == 'MESS V_I':
+
+        elif self.start_button.text() == 'MESS I':
             self.calc_voltage_before_jumper()
+
         elif self.start_button.text() == 'JUMPER CK':
             self.on_button_click('images_/Power_ON_PS.jpg')
         elif self.start_button.text()== 'MULTI ON':
             self.connect_multimeter()
+
+
         elif self.start_button.text()== 'SPANNUNG':
-            self.info_label.setText('Press STROM button')
+            self.info_label.setText('Press "MESS I" button')
             self.on_button_click('images_/images/PP7_4.jpg')
-            self.start_button.setText('STROM')
-            voltage_before_jumper = self.multimeter.query('MEASure:VOLTage:DC?')
-            voltage_before_jumper = self.voltage_before_jumper
+            self.start_button.setText('MESS I')
+            voltage_before_jumper = self.multimeter.query('MEAS:VOLT:DC?')
+            self.voltage_before_jumper = voltage_before_jumper
+            self.result_edit.setText(str(voltage_before_jumper))
             self.textBrowser.append(('PowerSUpply \n'+self.powersupply.query('MEASure:VOLTage? '+self.PS_channel)+'V'))
+
+
         elif self.start_button.text()== 'STROM':
             self.calc_voltage_before_jumper()
         elif (self.start_button.text()== 'Messung' and self.AC_DC_box.text == 'DCV'):
@@ -311,7 +318,7 @@ class App(QMainWindow):
         else:
             self.start_button.setText("Start")
             self.textBrowser.append('disconnected')
-
+###########################################################################################################################################################################################
     def on_cal_voltage_current(self):
         if self.AC_DC_box.currentText() == 'DCV' and self.test_button.text() == 'GO':
             ret_volt = self.multimeter.query('*IDN?')
@@ -326,9 +333,12 @@ class App(QMainWindow):
                 self.textBrowser.append("DC Voltage at R709:"+ str(ret_volt))
                 self.result_edit.setStyleSheet("background-color: green;")
                 self.result_edit.setText(ret_volt)
+                self.dcv_bw_gnd_n_r709 = ret_volt
             else:
                 self.result_edit.setStyleSheet("background-color: red;")
                 self.result_edit.setText(ret_volt)
+                self.dcv_bw_gnd_n_r709 = str(ret_volt)+' Negative Value'
+                self.dcv_bw_gnd_n_r709 = ret_volt
                 QMessageBox.information(self, "Status", "Voltage is diferred"+str(ret_volt))
 
             self.test_button.setText('R700')
@@ -340,9 +350,11 @@ class App(QMainWindow):
                 self.textBrowser.append("DC Voltage at R700:"+ str(ret_volt))
                 self.result_edit.setStyleSheet("background-color: green;")
                 self.result_edit.setText(ret_volt)
+                self.dcv_bw_gnd_n_r700 = ret_volt
             else:
                 self.result_edit.setStyleSheet("background-color: red;")
                 self.result_edit.setText(ret_volt)
+                self.dcv_bw_gnd_n_r700 = ret_volt
                 QMessageBox.information(self, "Status", "Voltage is diferred"+str(ret_volt))
             self.test_button.setText('R709')
             self.test_button.setEnabled(False)
@@ -356,11 +368,13 @@ class App(QMainWindow):
             ret_volt = self.multimeter.query('MEAS:VOLT:AC?')
             if float(ret_volt) <= 0.01:
                 self.textBrowser.append("AC Voltage at R709:"+ str(ret_volt))
+                self.acv_bw_gnd_n_r709  = ret_volt
                 self.result_edit.setStyleSheet("background-color: green;")
                 self.result_edit.setText(ret_volt)
             else:
                 self.result_edit.setStyleSheet("background-color: red;")
                 self.result_edit.setText(ret_volt)
+                self.acv_bw_gnd_n_r709  = ret_volt
                 QMessageBox.information(self, "Status", "Voltage is diferred"+str(ret_volt))
             self.test_button.setText('R700')
             self.on_button_click('images_/images/R709.jpg')
@@ -535,24 +549,20 @@ class App(QMainWindow):
     def connect_or_disconnect_serial_port(self):
         if self.serial_port is None:
             com_port = self.port_box.currentText()            # Get the selected com port and baud rate
-            baud_rate = int(self.baud_rates_combo.currentText())
+            baud_rate = int(self.baudrate_box.currentText())
             self.serial_port = serial.Serial(com_port, baud_rate, timeout=1)            # Create a new serial port object and open it
             self.port_box.setEnabled(False)  # Disable the combo boxes and change the button text
-            self.baud_rates_combo.setEnabled(False)
+            self.baudrate_box.setEnabled(False)
             self.connect_button.setText('Disconnect')
             self.textBrowser.append('Serial Communication Connected')
-            self.test_button.setEnabled(True)
-            self.next_button.setEnabled(True)
             self.refresh_button.setEnabled(False)
         else:
             self.serial_port.close()            # Close the serial port
             self.serial_port = None
             self.connect_button.setEnabled(True)
             self.port_box.setEnabled(True)            # Enable the combo boxes and change the button text
-            self.baud_rates_combo.setEnabled(True)
+            self.baudrate_box.setEnabled(True)
             self.refresh_button.setEnabled(True)
-            self.next_button.setEnabled(False)
-            self.test_button.setEnabled(False)
             self.connect_button.setText('Connect')
             self.textBrowser.append('Communication Disconnected')
     def refresh_connect(self):
@@ -646,13 +656,17 @@ class App(QMainWindow):
             self.textBrowser.append('Wrong Input')
     
     def calc_voltage_before_jumper(self):
-        current = float(self.powersupply.query('MEASure:CURRent? '+self.PS_channel))
+        current = float(self.powersupply.query('MEASure:CURRent? '+self.PS_channel))        
         self.result_edit.setText('Current: '+str(current))
         self.textBrowser.append('Current: '+str(current))
-        if self.start_button.text() == 'MESS V_I':
+        if self.start_button.text() == 'MESS I':
             if 0.04 <= current <= 0.06:
                 self.start_button.setText('JUMPER CK')
                 self.start_button.setEnabled(False)
+                self.current_before_jumper = current
+                self.powersupply.write('OUTPut '+self.PS_channel+',OFF')
+                self.on_button_click('images_/images/close_jumper.jpg')
+                self.info_label.setText('Close the JUMPER')
             else:
                 QMessageBox.information(self, 'Information', 'Supplying Current is either more or less. So please Swith OFF the PowerSupply, and Put back all the Euipment back.')
                 self.powersupply.write('OUTPut '+self.PS_channel+',OFF')
@@ -664,6 +678,7 @@ class App(QMainWindow):
             if 0.09 <= current <= 0.15:
                 self.start_button.setEnabled(False)
                 self.AC_DC_box.setEnabled(True)
+                self.current_after_jumper = current
                 self.on_button_click('images_/images/sel_DC_in_multimeter.jpg')
                 QMessageBox.information(self, "Information", "Select DCV in the box near AC/DC")
                 self.info_label.setText('\n \n \n \n Select DCV from AC/DC..!')
