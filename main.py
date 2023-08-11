@@ -1,13 +1,10 @@
-import datetime, os, sys, time, openpyxl, configparser
-import pandas as pd
+import datetime, os, sys, time, openpyxl, configparser, serial
 import pyvisa as visa
-import serial
 from PyQt5 import uic
 from PyQt5.QtCore import *
 from PyQt5.QtGui import *
 from PyQt5.QtWidgets import *
-
-
+##################################################################################################################################
 class WorkerThread(QThread):
     process_completed = pyqtSignal()
     result_signal = pyqtSignal(str)
@@ -47,8 +44,8 @@ class WorkerThread(QThread):
             self.result_signal.emit('Serial Port Closed')
     def on_button_clicked(self):
         self.result_signal.emit("Button clicked")
-
-class SerialPortThread(QThread):        #    Thread to update com ports in the network
+##################################################################################################################################
+class SerialPortThread(QThread):
     com_ports_available = pyqtSignal(list)
     def run(self):
         com_ports = []
@@ -60,7 +57,7 @@ class SerialPortThread(QThread):        #    Thread to update com ports in the n
             except serial.SerialException:
                 pass
         self.com_ports_available.emit(com_ports)
-
+##################################################################################################################################
 class App(QMainWindow):
     def __init__(self):
         super(App, self).__init__()
@@ -69,8 +66,7 @@ class App(QMainWindow):
         self.setFixedSize(self.size())
         self.setStatusTip('Moewe Optik Gmbh. 2023')
         self.show()
-#############################################################################################################################################################
-
+        ########################################################################################################
         self.serial_port = None
         self.thread = None
         self.serial_thread = SerialPortThread()
@@ -80,7 +76,7 @@ class App(QMainWindow):
         self.baudrate_box.setCurrentText('115200')
         self.connect_button.clicked.connect(self.connect_or_disconnect_serial_port)
         self.refresh_button.clicked.connect(self.refresh_connect)
-###################################################################################################
+        ########################################################################################################
         self.commands = ['i2c:scan', 'i2c:read:53:04:FC', 'i2c:write:53:', 'i2c:read:53:20:00', 'i2c:write:73:04', 'i2c:scan','i2c:write:21:0300','i2c:write:21:0100','i2c:write:21:01FF', 'i2c:write:73:01',
                     'i2c:scan', 'i2c:write:4F:06990918', 'i2c:write:4F:01F8', 'i2c:read:4F:1E:00']
         self.start_button.clicked.connect(self.connect)
@@ -100,7 +96,7 @@ class App(QMainWindow):
         self.max_volt_tolz = 0
         self.max_current_tolz = 0
         self.value_edit.returnPressed.connect(self.load_voltage_current)
-##########################################################################################################################################################
+        ########################################################################################################
         self.AC_DC_box.setEnabled(False)
         self.test_button.setEnabled(False)
         self.value_edit.setEnabled(False)
@@ -109,7 +105,7 @@ class App(QMainWindow):
         self.version_edit.setEnabled(False)
         self.result_edit.setEnabled(False)
         self.firstMessage()
-##########################################################################################################################################################
+        ########################################################################################################
         self.save_button.clicked.connect(self.create_ini_file)
         self.current_before_jumper = 0
         self.current_after_jumper = 0
@@ -130,7 +126,7 @@ class App(QMainWindow):
         self.acv_bw_gnd_n_c430 = 0
         self.uid = 0
         self.ic704_register_reading = 0
-        ##################################################################################################################################################
+        ########################################################################################################
     def connect_multimeter(self):
         if not self.multimeter:
             try:
@@ -145,7 +141,7 @@ class App(QMainWindow):
             self.multimeter.close()
             self.multimeter = None
             self.textBrowser.append(self.multimeter.query('*IDN?'))
-
+    ########################################################################################################
     def connect_powersupply(self):
         if not self.powersupply:
             try:
@@ -165,8 +161,7 @@ class App(QMainWindow):
             self.powersupply = None
             self.PS_button.setText('PS ON')
             self.textBrowser.setText('Netzteil Disconnected')
-
-
+    ########################################################################################################
     def firstMessage(self):
         msgBox = QMessageBox()
         msgBox.setWindowIcon(QIcon('images_/icons/icon.png'))
@@ -180,7 +175,7 @@ class App(QMainWindow):
         # ret_value = msgBox.exec_()
         # if ret_value == QMessageBox.Ok:
         #     self.secondMessage()
-
+    ########################################################################################################
     def secondMessage(self):
         msgBox = QMessageBox()
         msgBox.setWindowIcon(QIcon('images_/icons/icon.png'))
@@ -192,7 +187,7 @@ class App(QMainWindow):
         self.title_label.setText('Preparation Test')
         self.info_label.setText('Press START Button')
         msgBox.exec_()
-
+    ########################################################################################################
     def on_button_click(self, file_path):
         if file_path:
             pixmap = QPixmap(file_path)
@@ -205,12 +200,9 @@ class App(QMainWindow):
                 if reply == QMessageBox.Yes:                    
                     self.start_button.setText('Netzteil ON')
                     self.on_button_click('images_/images/img4.jpg')
-                    self.info_label.setText('Press Netzteil ON button')
-                    
+                    self.info_label.setText('Press Netzteil ON button')                    
                 else:
                     self.on_button_click('images_/icons/3.jpg')
-
-
             if self.start_button.text() == 'JUMPER CK':
                 reply = self.jumper_close()
                 if reply == QMessageBox.Yes:
@@ -221,7 +213,7 @@ class App(QMainWindow):
                     self.info_label.setText('Press STROM button')
                 else:
                     self.on_button_click('images_/images/PP17.jpg')
-
+    ########################################################################################################
     def show_good_message(self):
         msgBox = QMessageBox()
         msgBox.setIcon(QMessageBox.Question)
@@ -230,8 +222,7 @@ class App(QMainWindow):
         self.title_label.setText('Powersupply Test')
         msgBox.setStandardButtons(QMessageBox.Yes | QMessageBox.No)        
         return msgBox.exec_()
-
-
+    ########################################################################################################
     def connect(self):
         if self.start_button.text() == 'START':
             self.on_button_click('images_/images/PP4.jpg')
@@ -253,16 +244,12 @@ class App(QMainWindow):
             self.on_button_click('images_/icons/2.jpg')
         elif self.start_button.text()== 'Netzteil ON':
             self.connect_powersupply()
-
         elif self.start_button.text() == 'MESS I':
             self.calc_voltage_before_jumper()
-
         elif self.start_button.text() == 'JUMPER CK':
             self.on_button_click('images_/Power_ON_PS.jpg')
         elif self.start_button.text()== 'MULTI ON':
             self.connect_multimeter()
-
-
         elif self.start_button.text()== 'SPANNUNG':
             self.info_label.setText('Press "MESS I" button')
             self.on_button_click('images_/images/PP7_4.jpg')
@@ -271,8 +258,6 @@ class App(QMainWindow):
             self.voltage_before_jumper = voltage_before_jumper
             self.result_edit.setText(str(voltage_before_jumper))
             self.textBrowser.append(('PowerSUpply \n'+self.powersupply.query('MEASure:VOLTage? '+self.PS_channel)+'V'))
-
-
         elif self.start_button.text()== 'STROM':
             self.calc_voltage_before_jumper()
         elif (self.start_button.text()== 'Messung' and self.AC_DC_box.text == 'DCV'):
@@ -296,20 +281,16 @@ class App(QMainWindow):
             QMessageBox.information(self, "Important", "Read and watch the image clearly and do the process carefully.")
             self.start_button.setText('JETZT')     
         elif self.start_button.text()=='JETZT':
-            # self.powersupply.write('OUTPut '+self.PS_channel+',ON')
-            # self.multimeter.query('*IDN?')
             self.info_label.setText('Switch ON Powersupply, and Multimeter')
             self.on_button_click('images_/images/board_with_cabels.jpg')
             QMessageBox.information(self, "Important", "Read and watch the image clearly and do the process carefully.")
             self.start_button.setText('MESS AN')
-
         elif self.start_button.text()=='MESS AN':
             self.info_label.setText('Switch ON Powersupply, and Multimeter and wait 5 seconds.\Then press SERIAL TEST button')
             self.on_button_click('images_/images/Start2.png')
             QMessageBox.information(self, "Important", "Read and watch the image clearly and do the process carefully.")
             self.connect_button.setEnabled(True)
             self.start_button.setEnabled(False)
-
         elif self.start_button.text()=='SERIAL TEST':
             self.start_process()
             self.info_label.setText('Wait 10 seconds ')
@@ -318,15 +299,14 @@ class App(QMainWindow):
         else:
             self.start_button.setText("Start")
             self.textBrowser.append('disconnected')
-###########################################################################################################################################################################################
+    ########################################################################################################
     def on_cal_voltage_current(self):
         if self.AC_DC_box.currentText() == 'DCV' and self.test_button.text() == 'GO':
             ret_volt = self.multimeter.query('*IDN?')
             self.info_label.setText('See the Component in the Image and\n\n\n check the voltage at the same component.')
             self.textBrowser.append(str(ret_volt))
             self.test_button.setText('R709')
-            self.on_button_click('images_/images/R709.jpg')
-        
+            self.on_button_click('images_/images/R709.jpg')        
         elif self.AC_DC_box.currentText() == 'DCV' and self.test_button.text() == 'R709':
             ret_volt = self.multimeter.query('MEAS:VOLT:DC?')
             if 3.28 <= float(ret_volt) <= 3.38:
@@ -340,10 +320,8 @@ class App(QMainWindow):
                 self.dcv_bw_gnd_n_r709 = str(ret_volt)+' Negative Value'
                 self.dcv_bw_gnd_n_r709 = ret_volt
                 QMessageBox.information(self, "Status", "Voltage is diferred"+str(ret_volt))
-
             self.test_button.setText('R700')
             self.on_button_click('images_/images/R700.jpg')
-
         elif self.AC_DC_box.currentText() == 'DCV' and self.test_button.text() == 'R700':
             ret_volt = self.multimeter.query('MEAS:VOLT:DC?')
             if 4.95 <= float(ret_volt) <= 5.05:
@@ -362,8 +340,6 @@ class App(QMainWindow):
             self.on_button_click('images_/images/R709.jpg')
             self.info_label.setText('Change the selection in AC/DC Box. \n\n\n Now we have to calculate AC Voltage at the last two components... \n\n\n So, Select ACV in AC/DC Box')
             QMessageBox.information(self, "Information", "Select ACV in the box near AC/DC")
-
-
         elif self.AC_DC_box.currentText() == 'ACV' and self.test_button.text() == 'R709':
             ret_volt = self.multimeter.query('MEAS:VOLT:AC?')
             if float(ret_volt) <= 0.01:
@@ -378,7 +354,6 @@ class App(QMainWindow):
                 QMessageBox.information(self, "Status", "Voltage is diferred"+str(ret_volt))
             self.test_button.setText('R700')
             self.on_button_click('images_/images/R709.jpg')
-
         elif self.AC_DC_box.currentText() == 'ACV' and self.test_button.text() == 'R700':
             ret_volt = self.multimeter.query('MEAS:VOLT:AC?')
             if float(ret_volt) <= 0.01:
@@ -395,7 +370,6 @@ class App(QMainWindow):
             QMessageBox.information(self, "Information", "Select DCV in the box near AC/DC")
             self.test_button.setText('C443')
             self.on_button_click('images_/images/C443.jpg')
-
         elif self.AC_DC_box.currentText() == 'DCV' and self.test_button.text() == 'C443':
             ret_volt = self.multimeter.query('MEAS:VOLT:DC?')
             if 11.95 <= float(ret_volt) <= 12.05:
@@ -408,7 +382,6 @@ class App(QMainWindow):
                 QMessageBox.information(self, "Status", "Voltage is diferred"+str(ret_volt))
             self.test_button.setText('C442')
             self.on_button_click('images_/images/C442.jpg')
-
         elif self.AC_DC_box.currentText() == 'DCV' and self.test_button.text() == 'C442':
             ret_volt = self.multimeter.query('MEAS:VOLT:DC?')
             if 4.95 <= float(ret_volt) <= 5.05:
@@ -421,7 +394,6 @@ class App(QMainWindow):
                 QMessageBox.information(self, "Status", "Voltage is diferred"+str(ret_volt))
             self.test_button.setText('C441')
             self.on_button_click('images_/images/C441.jpg')
-
         elif self.AC_DC_box.currentText() == 'DCV' and self.test_button.text() == 'C441':
             ret_volt = self.multimeter.query('MEAS:VOLT:DC?')
             if 4.95 <= float(ret_volt) <= 5.05:
@@ -434,7 +406,6 @@ class App(QMainWindow):
                 QMessageBox.information(self, "Status", "Voltage is diferred"+str(ret_volt))
             self.test_button.setText('C412')
             self.on_button_click('images_/images/C412.jpg')
-
         elif self.AC_DC_box.currentText() == 'DCV' and self.test_button.text() == 'C412':
             ret_volt = self.multimeter.query('MEAS:VOLT:DC?')
             if 4.98 <= float(ret_volt) <= 5.02:
@@ -447,7 +418,6 @@ class App(QMainWindow):
                 QMessageBox.information(self, "Status", "Voltage is diferred"+str(ret_volt))
             self.test_button.setText('C430')
             self.on_button_click('images_/images/C430.jpg')
-
         elif self.AC_DC_box.currentText() == 'DCV' and self.test_button.text() == 'C430':
             ret_volt = self.multimeter.query('MEAS:VOLT:DC?')
             if 2.028 <= float(ret_volt) <= 2.068:
@@ -462,8 +432,7 @@ class App(QMainWindow):
             self.on_button_click('images_/images/C443.jpg')
             self.test_button.setEnabled(False)
             self.AC_DC_box.setEnabled(True)
-            self.info_label.setText('\n \n \n \n Select DCV in AC DC Box')
-        
+            self.info_label.setText('\n \n \n \n Select DCV in AC DC Box')        
         elif self.AC_DC_box.currentText() == 'ACV' and self.test_button.text() == 'C443':
             ret_volt = self.multimeter.query('MEAS:VOLT:AC?')
             if float(ret_volt) < 0.01:
@@ -476,7 +445,6 @@ class App(QMainWindow):
                 QMessageBox.information(self, "Status", "Voltage is diferred"+str(ret_volt))
             self.test_button.setText('C442')
             self.on_button_click('images_/images/C442.jpg')
-
         elif self.AC_DC_box.currentText() == 'ACV' and self.test_button.text() == 'C442':
             ret_volt = self.multimeter.query('MEAS:VOLT:AC?')
             if float(ret_volt) < 0.05:
@@ -487,7 +455,6 @@ class App(QMainWindow):
                 QMessageBox.information(self, "Status", "Voltage is diferred"+str(ret_volt))
             self.test_button.setText('C441')
             self.on_button_click('images_/images/C441.jpg')
-
         elif self.AC_DC_box.currentText() == 'ACV' and self.test_button.text() == 'C441':
             ret_volt = self.multimeter.query('MEAS:VOLT:AC?')
             if float(ret_volt) < 0.05:
@@ -500,7 +467,6 @@ class App(QMainWindow):
                 QMessageBox.information(self, "Status", "Voltage is diferred"+str(ret_volt))
             self.test_button.setText('C412')
             self.on_button_click('images_/images/C412.jpg')
-
         elif self.AC_DC_box.currentText() == 'ACV' and self.test_button.text() == 'C412':
             ret_volt = self.multimeter.query('MEAS:VOLT:AC?')
             if float(ret_volt) < 0.001:
@@ -513,7 +479,6 @@ class App(QMainWindow):
                 QMessageBox.information(self, "Status", "Voltage is diferred"+str(ret_volt))
             self.test_button.setText('C430')
             self.on_button_click('images_/images/C430.jpg')
-
         elif self.AC_DC_box.currentText() == 'ACV' and self.test_button.text() == 'C430':
             ret_volt = self.multimeter.query('MEAS:VOLT:AC?')
             if float(ret_volt) < 0.001:
@@ -532,20 +497,21 @@ class App(QMainWindow):
             QMessageBox.information(self, "Status", "Assemble SDIO board, spacers and screws")
         else:
             QMessageBox.information(self, "Status", "Wrong Testing")
-
+    ########################################################################################################
     def selct_AC_DC_box(self):
         self.test_button.setEnabled(True)
         self.AC_DC_box.setEnabled(False)
-
+    ########################################################################################################
     def update_time_label(self):
         current_time = QTime.currentTime().toString(Qt.DefaultLocaleLongDate)
         current_date = QDate.currentDate().toString(Qt.DefaultLocaleLongDate)
         self.time_label.setText(f"{current_time} - {current_date}")
         # return current_date, current_time
+    ########################################################################################################
     def update_com_ports(self, com_ports):
         self.port_box.clear()
         self.port_box.addItems(com_ports)
-
+    ########################################################################################################
     def connect_or_disconnect_serial_port(self):
         if self.serial_port is None:
             com_port = self.port_box.currentText()            # Get the selected com port and baud rate
@@ -568,15 +534,17 @@ class App(QMainWindow):
             self.refresh_button.setEnabled(True)
             self.connect_button.setText('Connect')
             self.textBrowser.append('Communication Disconnected')
+    ########################################################################################################
     def refresh_connect(self):
         self.serial_thread.quit()
         self.serial_thread.wait()
         self.serial_thread.start()
-
+    ########################################################################################################
     def on_widget_button_clicked(self, message):
         self.textBrowser.append(message)
     def update_lineinsert(self, response):
             self.id_Edit.setText(response)
+    ########################################################################################################
     def start_process(self):
         if self.thread is None or not self.thread.isRunning():
             QMessageBox.information(self, "Process Started", "Process has been started.")
@@ -587,9 +555,10 @@ class App(QMainWindow):
             self.thread.start()
         else:
             QMessageBox.warning(self, "Process In Progress", "Process is already running.")
+    ########################################################################################################
     def process_completed(self):
         QMessageBox.information(self, "Process Completed", "Process has been completed.")
-
+    ########################################################################################################
     def load_voltage_current(self):
         if (self.vals_button.text() == 'CH' and self.value_edit.text() in ['ch1', 'CH1', 'Ch1', 'cH1']):
             self.powersupply.write('INSTrument CH1')
@@ -599,7 +568,6 @@ class App(QMainWindow):
             self.value_edit.clear()
             self.on_button_click('images_/images/PP7_1.jpg')
             self.value_edit.setValidator(QRegExpValidator(QRegExp(r'^\d+(\.\d+)?$')))
-
         elif (self.vals_button.text() == 'CH' and self.value_edit.text() in ['ch2', 'CH2', 'Ch2', 'cH2']):
             self.powersupply.write('INSTrument CH2')
             self.PS_channel = self.value_edit.text()
@@ -608,7 +576,6 @@ class App(QMainWindow):
             self.value_edit.clear()
             self.on_button_click('images_/images/PP7_1.jpg')
             self.value_edit.setValidator(QRegExpValidator(QRegExp(r'^\d+(\.\d+)?$')))
-
         elif (self.vals_button.text() == 'CH' and self.value_edit.text() in ['ch3', 'CH3', 'Ch3', 'cH3']):
             self.powersupply.write('INSTrument CH3')
             self.PS_channel = self.value_edit.text()
@@ -617,7 +584,6 @@ class App(QMainWindow):
             self.value_edit.clear()
             self.on_button_click('images_/images/PP7_1.jpg')
             self.value_edit.setValidator(QRegExpValidator(QRegExp(r'^\d+(\.\d+)?$')))
-
         elif self.vals_button.text() == 'V':
             self.max_voltage =  self.value_edit.text()
             self.powersupply.write(self.PS_channel+':VOLTage ' + self.max_voltage)
@@ -627,11 +593,9 @@ class App(QMainWindow):
             self.info_label.setText('Enter 0.5 in the box next to I')
             self.value_edit.clear()
             self.on_button_click('images_/images/PP7_2.jpg')
-
         elif self.vals_button.text() == 'I':
             self.max_current = self.value_edit.text()
             self.powersupply.write('CH1:CURRent ' + self.max_current)
-
             # self.textBrowser.append(self.powersupply.query(self.PS_channel+':CURRent?'))
             self.info_label.setText('Enter 0.05 in the box next to I')
             self.powersupply.write('OUTPut '+self.PS_channel+',ON')
@@ -642,7 +606,6 @@ class App(QMainWindow):
             self.value_edit.setStyleSheet("")
             self.value_edit.clear()
             self.on_button_click('images_/images/PP8.jpg')
-
         # elif self.vals_button.text() == 'Tolz V':
         #     self.volt_toleranz = self.value_edit.text()
         #     self.textBrowser.append(self.volt_toleranz)
@@ -650,7 +613,6 @@ class App(QMainWindow):
         #     self.info_label.setText('Enter 0.5 in the box next to I')
         #     self.vals_button.setText('Tolz I')
         #     self.on_button_click('images_/images/PP8_1.jpg')
-
         # elif self.vals_button.text() == 'Tolz I':
         #     self.curr_toleranz = self.value_edit.text()
         #     self.textBrowser.append(self.curr_toleranz)
@@ -661,7 +623,7 @@ class App(QMainWindow):
         #     self.on_button_click('images_/images/PP17.jpg')
         else:
             self.textBrowser.append('Wrong Input')
-    
+    ########################################################################################################
     def calc_voltage_before_jumper(self):
         current = float(self.powersupply.query('MEASure:CURRent? '+self.PS_channel))        
         self.result_edit.setText('Current: '+str(current))
@@ -692,7 +654,7 @@ class App(QMainWindow):
             else:
                 QMessageBox.information(self, 'Information', 'Supplying Current is either more or less. So please Swith OFF the PowerSupply, and Put back all the Euipment back.')
                 self.powersupply.write('OUTPut '+self.PS_channel+',OFF')
-                
+    ########################################################################################################
     def jumper_close(self):
         msgBox = QMessageBox()
         msgBox.setIcon(QMessageBox.Question)
@@ -700,7 +662,7 @@ class App(QMainWindow):
         msgBox.setWindowTitle("IMPORTANT!")
         msgBox.setStandardButtons(QMessageBox.Yes | QMessageBox.No)
         return msgBox.exec_()
-#####################################################################################################################################################################################
+    ########################################################################################################
     def closeEvent(self, event):
         if not self.powersupply is None:
             try:
@@ -715,11 +677,9 @@ class App(QMainWindow):
         else:
             pass
         event.accept()
-
-
+    ########################################################################################################
     def create_ini_file(self):
         config = configparser.ConfigParser()
-
         config.add_section('Powersupply Test')
         config.add_section('I2C Test')
         power_supply_values = {
@@ -747,22 +707,16 @@ class App(QMainWindow):
             "UID" : self.uid,
             "ic704_register_reading" : self.ic704_register_reading
         }
-
-        # Loop through the dictionary to set values for each key
         for key, value in power_supply_values.items():
             config.set('Powersupply Test', key, str(value))
-
         for key, value in I2C_Values.items():
             config.set('I2C Test', key, str(value))
-
         with open('conf_igg.ini', 'w') as configfile:
             config.write(configfile)
-
-
+    ########################################################################################################
 def main():
     app = QApplication(sys.argv)
     Window = App()
     sys.exit(app.exec_())
-
 if __name__ == '__main__':
     main()
