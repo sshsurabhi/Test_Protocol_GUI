@@ -114,19 +114,19 @@ selection-color: rgb(0, 85, 255);</string>
    <widget class="QWidget" name="widget" native="true">
     <property name="geometry">
      <rect>
-      <x>20</x>
+      <x>60</x>
       <y>80</y>
-      <width>751</width>
+      <width>641</width>
       <height>101</height>
      </rect>
     </property>
     <widget class="QPushButton" name="start_button">
      <property name="geometry">
       <rect>
-       <x>0</x>
+       <x>10</x>
        <y>0</y>
-       <width>141</width>
-       <height>101</height>
+       <width>101</width>
+       <height>91</height>
       </rect>
      </property>
      <property name="font">
@@ -140,7 +140,7 @@ selection-color: rgb(0, 85, 255);</string>
       <string notr="true"/>
      </property>
      <property name="text">
-      <string>Netzteil ON</string>
+      <string>JETZT</string>
      </property>
      <property name="checkable">
       <bool>false</bool>
@@ -149,9 +149,9 @@ selection-color: rgb(0, 85, 255);</string>
     <widget class="QPushButton" name="test_button">
      <property name="geometry">
       <rect>
-       <x>590</x>
+       <x>540</x>
        <y>0</y>
-       <width>151</width>
+       <width>101</width>
        <height>101</height>
       </rect>
      </property>
@@ -172,7 +172,7 @@ selection-color: rgb(0, 85, 255);</string>
     <widget class="QLineEdit" name="result_edit">
      <property name="geometry">
       <rect>
-       <x>380</x>
+       <x>330</x>
        <y>60</y>
        <width>201</width>
        <height>41</height>
@@ -195,7 +195,7 @@ selection-color: rgb(0, 85, 255);</string>
     <widget class="QLineEdit" name="value_edit">
      <property name="geometry">
       <rect>
-       <x>200</x>
+       <x>170</x>
        <y>6</y>
        <width>151</width>
        <height>41</height>
@@ -227,7 +227,7 @@ selection-color: rgb(0, 85, 255);</string>
     <widget class="QLabel" name="version_button">
      <property name="geometry">
       <rect>
-       <x>150</x>
+       <x>120</x>
        <y>50</y>
        <width>71</width>
        <height>41</height>
@@ -259,7 +259,7 @@ selection-color: rgb(0, 85, 255);</string>
     <widget class="QLabel" name="vals_button">
      <property name="geometry">
       <rect>
-       <x>150</x>
+       <x>120</x>
        <y>6</y>
        <width>51</width>
        <height>41</height>
@@ -291,7 +291,7 @@ selection-color: rgb(0, 85, 255);</string>
     <widget class="QLineEdit" name="version_edit">
      <property name="geometry">
       <rect>
-       <x>220</x>
+       <x>190</x>
        <y>50</y>
        <width>131</width>
        <height>41</height>
@@ -311,7 +311,7 @@ selection-color: rgb(0, 85, 255);</string>
     <widget class="QComboBox" name="AC_DC_box">
      <property name="geometry">
       <rect>
-       <x>450</x>
+       <x>400</x>
        <y>10</y>
        <width>131</width>
        <height>41</height>
@@ -328,7 +328,7 @@ selection-color: rgb(0, 85, 255);</string>
     <widget class="QLabel" name="label">
      <property name="geometry">
       <rect>
-       <x>380</x>
+       <x>330</x>
        <y>10</y>
        <width>71</width>
        <height>41</height>
@@ -407,10 +407,10 @@ selection-color: rgb(0, 85, 255);</string>
     <widget class="QPushButton" name="refresh_button">
      <property name="geometry">
       <rect>
-       <x>420</x>
-       <y>0</y>
-       <width>131</width>
-       <height>95</height>
+       <x>280</x>
+       <y>53</y>
+       <width>101</width>
+       <height>41</height>
       </rect>
      </property>
      <property name="font">
@@ -434,9 +434,9 @@ selection-color: rgb(0, 85, 255);</string>
      <property name="geometry">
       <rect>
        <x>280</x>
-       <y>0</y>
-       <width>131</width>
-       <height>95</height>
+       <y>3</y>
+       <width>101</width>
+       <height>41</height>
       </rect>
      </property>
      <property name="font">
@@ -610,9 +610,9 @@ selection-color: rgb(0, 85, 255);</string>
      <property name="geometry">
       <rect>
        <x>10</x>
-       <y>110</y>
+       <y>100</y>
        <width>731</width>
-       <height>51</height>
+       <height>61</height>
       </rect>
      </property>
      <property name="frameShape">
@@ -625,7 +625,7 @@ selection-color: rgb(0, 85, 255);</string>
     <widget class="QPushButton" name="save_button">
      <property name="geometry">
       <rect>
-       <x>580</x>
+       <x>600</x>
        <y>0</y>
        <width>131</width>
        <height>95</height>
