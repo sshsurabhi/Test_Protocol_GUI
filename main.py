@@ -148,7 +148,7 @@ class App(QMainWindow):
                 self.powersupply = self.rm.open_resource('TCPIP0::192.168.222.141::INSTR')
                 self.textBrowser.setText(self.powersupply.resource_name)
                 self.start_button.setEnabled(False)
-                self.value_edit.setStyleSheet("background-color: yellow;")
+                self.value_edit.setStyleSheet("background-color: lightyellow;")
                 self.info_label.setText('write CH1 in the box next to CH and Press ENTER')
                 self.value_edit.setEnabled(True)
                 self.vals_button.setText('CH')
@@ -171,10 +171,9 @@ class App(QMainWindow):
         self.on_button_click('images_/images/PP11.png')
         msgBox.setStandardButtons(QMessageBox.Ok)
         self.info_label.setText('  Press START Button  ')
-        msgBox.exec_()
-        # ret_value = msgBox.exec_()
-        # if ret_value == QMessageBox.Ok:
-        #     self.secondMessage()
+        ret_value = msgBox.exec_()
+        if ret_value == QMessageBox.Ok:
+            self.secondMessage()
     ########################################################################################################
     def secondMessage(self):
         msgBox = QMessageBox()
@@ -203,7 +202,7 @@ class App(QMainWindow):
                     self.info_label.setText('Press Netzteil ON button')                    
                 else:
                     self.on_button_click('images_/icons/3.jpg')
-            if self.start_button.text() == 'JUMPER CK':
+            if self.start_button.text() == 'JUMPER OK':
                 reply = self.jumper_close()
                 if reply == QMessageBox.Yes:
                     self.start_button.setText('STROM')
@@ -226,11 +225,11 @@ class App(QMainWindow):
     def connect(self):
         if self.start_button.text() == 'START':
             self.on_button_click('images_/images/PP4.jpg')
-            self.info_label.setText("Place the board on ESD Matte See the Image on the right.\n \n Check all your environment with the image. Check All connections.\n \n Please close if anything not correct. If correct, press step1 Button.")
+            self.info_label.setText("Place the board on ESD Matte See the Image on the right.\n\nCheck all your environment with the image\n\nCheck All connections.Please close if anything not correct.\n\nIf correct, press step1 Button.")
             self.start_button.setText("STEP1")
         elif self.start_button.text() == 'STEP1':
             self.on_button_click('images_/images/PP4_.jpg')
-            self.info_label.setText('Check all the "4" screws are fitted according to the image.\n\n If not then please fit 4x "M2,5x5" Torx and M 2.5 Screws on X200 & X300 please press the button Step2.')
+            self.info_label.setText('Check all the "4" screws\n\naccording to the image. If not then please fit\n\n4x "M2,5x5" Torx and M 2.5 Screws\n\nX200 & X300 please press the button Step2.')
             self.start_button.setText("STEP2")
         elif self.start_button.text() == 'STEP2':
             self.on_button_click('images_/images/board_on_mat.jpg')
@@ -246,7 +245,7 @@ class App(QMainWindow):
             self.connect_powersupply()
         elif self.start_button.text() == 'MESS I':
             self.calc_voltage_before_jumper()
-        elif self.start_button.text() == 'JUMPER CK':
+        elif self.start_button.text() == 'JUMPER OK':
             self.on_button_click('images_/Power_ON_PS.jpg')
         elif self.start_button.text()== 'MULTI ON':
             self.connect_multimeter()
@@ -630,7 +629,7 @@ class App(QMainWindow):
         self.textBrowser.append('Current: '+str(current))
         if self.start_button.text() == 'MESS I':
             if 0.04 <= current <= 0.06:
-                self.start_button.setText('JUMPER CK')
+                self.start_button.setText('JUMPER OK')
                 self.start_button.setEnabled(False)
                 self.current_before_jumper = current
                 self.powersupply.write('OUTPut '+self.PS_channel+',OFF')
@@ -639,7 +638,7 @@ class App(QMainWindow):
             else:
                 QMessageBox.information(self, 'Information', 'Supplying Current is either more or less. So please Swith OFF the PowerSupply, and Put back all the Euipment back.')
                 self.powersupply.write('OUTPut '+self.PS_channel+',OFF')
-                self.start_button.setText('JUMPER CK')
+                self.start_button.setText('JUMPER OK')
                 self.start_button.setEnabled(False)
                 self.info_label.setText('Close the JUMPER')
                 self.on_button_click('images_/images/close_jumper.jpg')
