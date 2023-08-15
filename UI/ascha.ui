@@ -140,7 +140,7 @@ selection-color: rgb(0, 85, 255);</string>
       <string notr="true"/>
      </property>
      <property name="text">
-      <string>START</string>
+      <string>Netzteil ON</string>
      </property>
      <property name="checkable">
       <bool>false</bool>
@@ -167,6 +167,9 @@ selection-color: rgb(0, 85, 255);</string>
      </property>
      <property name="text">
       <string>GO</string>
+     </property>
+     <property name="autoDefault">
+      <bool>false</bool>
      </property>
     </widget>
     <widget class="QLineEdit" name="result_edit">
@@ -378,7 +381,7 @@ selection-color: rgb(0, 85, 255);</string>
        <pointsize>14</pointsize>
        <weight>75</weight>
        <bold>true</bold>
-       <underline>true</underline>
+       <underline>false</underline>
       </font>
      </property>
      <property name="mouseTracking">

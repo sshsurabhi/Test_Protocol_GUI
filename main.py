@@ -99,6 +99,7 @@ class App(QMainWindow):
         ########################################################################################################
         self.AC_DC_box.setEnabled(False)
         self.test_button.setEnabled(False)
+        self.save_button.setEnabled(False)
         self.value_edit.setEnabled(False)
         self.connect_button.setEnabled(False)
         self.refresh_button.setEnabled(False)
@@ -134,7 +135,7 @@ class App(QMainWindow):
                 self.textBrowser.append(self.multimeter.query('*IDN?'))
                 self.on_button_click('images_/images/R709_before_jumper.jpg')
                 self.start_button.setText('SPANNUNG')
-                self.info_label.setText('CHeck VOLTAGE at the component R709')
+                self.info_label.setText('Check VOLTAGE at the component R709.\nIt should be between 3.28V to 3.8V.\n If it is other value,\nthen please pack the board back.' )
             except visa.errors.VisaIOError:
                 self.textBrowser.append('Multimeter has not been presented')
         else:
@@ -149,7 +150,7 @@ class App(QMainWindow):
                 self.textBrowser.setText(self.powersupply.resource_name)
                 self.start_button.setEnabled(False)
                 self.value_edit.setStyleSheet("background-color: lightyellow;")
-                self.info_label.setText('write CH1 in the box next to CH and Press ENTER')
+                self.info_label.setText('Write CH1 in the Yellow Box (Highlighted)\n \n next to CH \n\n Press "ENTER"')
                 self.value_edit.setEnabled(True)
                 self.vals_button.setText('CH')
                 self.on_button_click('images_/images/PP7.jpg')
@@ -168,9 +169,9 @@ class App(QMainWindow):
         msgBox.setText("Welcome to the testing world.")
         msgBox.setInformativeText("Press OK if you are ready.")
         msgBox.setWindowTitle("Message")
-        self.on_button_click('images_/images/PP11.png')
+        self.on_button_click('images_/images/Welcome.jpg')
         msgBox.setStandardButtons(QMessageBox.Ok)
-        self.info_label.setText('  Press START Button  ')
+        self.info_label.setText('Now,\n  Press START Button  ')
         ret_value = msgBox.exec_()
         if ret_value == QMessageBox.Ok:
             self.secondMessage()
@@ -182,10 +183,11 @@ class App(QMainWindow):
         msgBox.setInformativeText("Then press the button.")
         msgBox.setWindowTitle("Message")
         msgBox.setStandardButtons(QMessageBox.Ok)
-        self.on_button_click('images_/images/PP1.jpg')
-        self.title_label.setText('Preparation Test')
-        self.info_label.setText('Press START Button')
-        msgBox.exec_()
+        ret_value = msgBox.exec_()
+        if ret_value == QMessageBox.Ok:
+            self.title_label.setText('Preparation Test')
+            self.info_label.setText('Press START Button')
+            self.on_button_click('images_/images/PP1.jpg')
     ########################################################################################################
     def on_button_click(self, file_path):
         if file_path:
@@ -199,9 +201,10 @@ class App(QMainWindow):
                 if reply == QMessageBox.Yes:                    
                     self.start_button.setText('Netzteil ON')
                     self.on_button_click('images_/images/img4.jpg')
-                    self.info_label.setText('Press Netzteil ON button')                    
+                    self.info_label.setText('Power ON of the Powersupply and also Multimeter...\n and wait for 5 seconds.\n Press "Netzteil ON"')                    
                 else:
                     self.on_button_click('images_/icons/3.jpg')
+                    
             if self.start_button.text() == 'JUMPER OK':
                 reply = self.jumper_close()
                 if reply == QMessageBox.Yes:
@@ -224,20 +227,20 @@ class App(QMainWindow):
     ########################################################################################################
     def connect(self):
         if self.start_button.text() == 'START':
-            self.on_button_click('images_/images/PP4.jpg')
-            self.info_label.setText("Place the board on ESD Matte See the Image on the right.\n\nCheck all your environment with the image\n\nCheck All connections.Please close if anything not correct.\n\nIf correct, press step1 Button.")
+            self.on_button_click('images_/images/board_on_mat_.jpg')
+            self.info_label.setText("Place the board on ESD Matte See the Image on the right.\n\nCheck all your environment with the image\n\nCheck All connections.Please close if anything not correct.\n\nIf correct, \n\n''Press STEP1 Button.'' ")
             self.start_button.setText("STEP1")
         elif self.start_button.text() == 'STEP1':
             self.on_button_click('images_/images/PP4_.jpg')
-            self.info_label.setText('Check all the "4" screws\n\naccording to the image. If not then please fit\n\n4x "M2,5x5" Torx and M 2.5 Screws\n\nX200 & X300 please press the button Step2.')
+            self.info_label.setText('Check all the "4" screws\n\n of the board, (See the image). Fit all the 4 screws (4x M2,5x5 Torx)\n\ Press "STEP2".')
             self.start_button.setText("STEP2")
         elif self.start_button.text() == 'STEP2':
             self.on_button_click('images_/images/board_on_mat.jpg')
-            self.info_label.setText('Place back the Board on ESD Matte.')
+            self.info_label.setText('AFter fitting the 4 Screws, \n\n Place back the Board on ESD Matte. \\n then, Press "STEP3"')
             self.start_button.setText("STEP3")
         elif self.start_button.text()=='STEP3':
             self.on_button_click('images_/images/board_with_cabels.jpg')
-            self.info_label.setText('Connect the other Cable to the board. as shown in the Image on the right.')
+            self.info_label.setText('Connect the Power Cables to the board (see image).\n\n\n Press STEP4.')
             self.start_button.setText("STEP4")
         elif self.start_button.text()=='STEP4':
             self.on_button_click('images_/icons/2.jpg')
@@ -563,7 +566,7 @@ class App(QMainWindow):
             self.powersupply.write('INSTrument CH1')
             self.PS_channel = self.value_edit.text()
             self.vals_button.setText('V')
-            self.info_label.setText('Write 30 in the box next to V')
+            self.info_label.setText('Write 30 in the Yellow Box next to "V" \n \n Press "Enter"\n You can check the value in the powersupply.')
             self.value_edit.clear()
             self.on_button_click('images_/images/PP7_1.jpg')
             self.value_edit.setValidator(QRegExpValidator(QRegExp(r'^\d+(\.\d+)?$')))
@@ -571,7 +574,7 @@ class App(QMainWindow):
             self.powersupply.write('INSTrument CH2')
             self.PS_channel = self.value_edit.text()
             self.vals_button.setText('V')
-            self.info_label.setText('Enter 30 in the box next to V')
+            self.info_label.setText('Write 30 in the Yellow Box next to "V" \n \n Press "Enter"\n You can check the value in the powersupply.')
             self.value_edit.clear()
             self.on_button_click('images_/images/PP7_1.jpg')
             self.value_edit.setValidator(QRegExpValidator(QRegExp(r'^\d+(\.\d+)?$')))
@@ -579,7 +582,7 @@ class App(QMainWindow):
             self.powersupply.write('INSTrument CH3')
             self.PS_channel = self.value_edit.text()
             self.vals_button.setText('V')
-            self.info_label.setText('Enter 30 in the box next to V')
+            self.info_label.setText('Write 30 in the Yellow Box next to "V" \n \n Press "Enter"\n You can check the value in the powersupply.\n You can see the "Channel Selection" in the powersupply.')
             self.value_edit.clear()
             self.on_button_click('images_/images/PP7_1.jpg')
             self.value_edit.setValidator(QRegExpValidator(QRegExp(r'^\d+(\.\d+)?$')))
@@ -589,7 +592,7 @@ class App(QMainWindow):
             # self.textBrowser.append(self.powersupply.query(self.PS_channel+':VOLTage?'))
             max_voltage = self.max_voltage
             self.vals_button.setText('I')
-            self.info_label.setText('Enter 0.5 in the box next to I')
+            self.info_label.setText('Enter 0.5 in the box next to I\n\n Press "Enter".\n Check the value change in the Powersupply.')
             self.value_edit.clear()
             self.on_button_click('images_/images/PP7_2.jpg')
         elif self.vals_button.text() == 'I':
