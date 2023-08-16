@@ -254,6 +254,8 @@ class App(QMainWindow):
             self.on_button_click('images_/Power_ON_PS.jpg')
         elif self.start_button.text()== 'MULTI ON':
             self.connect_multimeter()
+
+            
         elif self.start_button.text()== 'SPANNUNG':
             self.info_label.setText('Press "MESS I" button')
             self.on_button_click('images_/images/PP7_4.jpg')
@@ -262,6 +264,8 @@ class App(QMainWindow):
             self.voltage_before_jumper = voltage_before_jumper
             self.result_edit.setText(str(voltage_before_jumper))
             self.textBrowser.append(('PowerSUpply \n'+self.powersupply.query('MEASure:VOLTage? '+self.PS_channel)+'V'))
+
+
         elif self.start_button.text()== 'STROM':
             self.calc_voltage_before_jumper()
         elif (self.start_button.text()== 'Messung' and self.AC_DC_box.text == 'DCV'):

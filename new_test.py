@@ -5,6 +5,59 @@ from PyQt5.QtCore import *
 from PyQt5.QtGui import *
 from PyQt5.QtWidgets import *
 ##################################################################################################################################
+class WorkerThread(QThread):
+    process_completed = pyqtSignal()
+    result_signal = pyqtSignal(str)
+    response_signal = pyqtSignal(str)
+    def __init__(self, commands, serial_port):
+        super().__init__()
+        self.commands = commands
+        self.serial_port = serial_port
+    def run(self):
+        if self.serial_port.is_open:
+            self.serial_port.timeout = 5
+            self.next_command_index = 0
+            for command in self.commands:
+                if self.next_command_index < (len(self.commands)+1):
+                    self.serial_port.write(command.encode())
+                    # self.textBrowser.append('Processed Command: '+command + ' ')
+                    response = self.serial_port.readline().decode('ascii')
+                    self.result_signal.emit((f"Response: {response}"))
+                    self.next_command_index += 1
+                    current_date = datetime.datetime.now()
+                    decimal_date = int(current_date.strftime('%Y%m%d'))
+                    hex_date = hex(decimal_date)[2:].upper().zfill(8)
+                    if command == self.commands[1]:
+                        ading = response.split(':')[3][:-1]
+                        self.commands[2] = self.commands[2]+ading+'01'+hex_date+'2A0101030000FFFF'
+                        self.response_signal.emit(ading)
+                    if command == self.commands[2]:
+                        start_time = time.time()
+                        while time.time() - start_time < 5:
+                            if response:
+                                break
+                            response = self.serial_port.readline().decode('ascii')
+                            self.result_signal.emit(response)
+            self.serial_port.close()
+            self.process_completed.emit()
+        else:
+            self.result_signal.emit('Serial Port Closed')
+    def on_button_clicked(self):
+        self.result_signal.emit("Button clicked")
+##################################################################################################################################
+class SerialPortThread(QThread):
+    com_ports_available = pyqtSignal(list)
+    def run(self):
+        com_ports = []
+        for i in range(256):
+            try:
+                s = serial.Serial('COM'+str(i))
+                com_ports.append('COM'+str(i))
+                s.close()
+            except serial.SerialException:
+                pass
+        self.com_ports_available.emit(com_ports)
+##################################################################################################################################
 class App(QMainWindow):
     def __init__(self):
         super(App, self).__init__()
@@ -16,32 +69,93 @@ class App(QMainWindow):
         ########################################################################################################
         self.serial_port = None
         self.thread = None
-
-        # self.serial_thread = SerialPortThread()
-        # self.serial_thread.com_ports_available.connect(self.update_com_ports)
-        # self.serial_thread.start()
-
+        self.serial_thread = SerialPortThread()
+        self.serial_thread.com_ports_available.connect(self.update_com_ports)
+        self.serial_thread.start()
         self.baudrate_box.addItems(['9600','57600','115200'])
         self.baudrate_box.setCurrentText('115200')
-        # self.connect_button.clicked.connect(self.connect_or_disconnect_serial_port)
-        # self.refresh_button.clicked.connect(self.refresh_connect)
+        self.connect_button.clicked.connect(self.connect_or_disconnect_serial_port)
+        self.refresh_button.clicked.connect(self.refresh_connect)
         ########################################################################################################
         self.commands = ['i2c:scan', 'i2c:read:53:04:FC', 'i2c:write:53:', 'i2c:read:53:20:00', 'i2c:write:73:04', 'i2c:scan','i2c:write:21:0300','i2c:write:21:0100','i2c:write:21:01FF', 'i2c:write:73:01',
                     'i2c:scan', 'i2c:write:4F:06990918', 'i2c:write:4F:01F8', 'i2c:read:4F:1E:00']
         self.start_button.clicked.connect(self.connect)
         ########################################################################################################
+        # self.timer = QTimer(self)
+        # self.timer.timeout.connect(self.update_time_label)
+        # self.timer.start(1000) 
+        ########################################################################################################
         self.rm = visa.ResourceManager()
         self.multimeter = None
         self.powersupply = None
-
-
+        self.AC_DC_box.addItems(['<select>', 'DCV', 'ACV'])
+        self.AC_DC_box.currentTextChanged.connect(self.selct_AC_DC_box)
+        self.test_button.clicked.connect(self.on_cal_voltage_current)
+        ########################################################################################################
         self.config_file = configparser.ConfigParser()
         self.config_file.read('conf_igg.ini')
         self.PS_channel = self.config_file.get('Power Supplies', 'Channel_set')
         self.max_voltage = self.config_file.get('Power Supplies', 'Voltage_set')
         self.max_current = self.config_file.get('Power Supplies', 'Current_set')
-
         self.value_edit.returnPressed.connect(self.load_voltage_current)
+        ########################################################################################################
+        self.AC_DC_box.setEnabled(False)
+        self.test_button.setEnabled(False)
+        self.save_button.setEnabled(False)
+        self.value_edit.setEnabled(False)
+        self.connect_button.setEnabled(False)
+        self.refresh_button.setEnabled(False)
+        self.version_edit.setEnabled(False)
+        self.result_edit.setEnabled(False)
+        self.firstMessage()
+        ########################################################################################################
+        # self.save_button.clicked.connect(self.create_ini_file)
+        self.current_before_jumper = 0
+        self.current_after_jumper = 0
+        self.voltage_before_jumper = 0
+        self.dcv_bw_gnd_n_r709 = 0
+        self.dcv_bw_gnd_n_r700 = 0
+        self.acv_bw_gnd_n_r709 = 0
+        self.acv_bw_gnd_n_r700 = 0
+        self.dcv_bw_gnd_n_c443 = 0
+        self.dcv_bw_gnd_n_c442 = 0
+        self.dcv_bw_gnd_n_c441 = 0
+        self.dcv_bw_gnd_n_c412 = 0
+        self.dcv_bw_gnd_n_c430 = 0
+        self.acv_bw_gnd_n_c443 = 0
+        self.acv_bw_gnd_n_c442 = 0
+        self.acv_bw_gnd_n_c441 = 0
+        self.acv_bw_gnd_n_c412 = 0
+        self.acv_bw_gnd_n_c430 = 0
+        self.uid = 0
+        self.ic704_register_reading = 0
+        ########################################################################################################
+    def firstMessage(self):
+        msgBox = QMessageBox()
+        msgBox.setWindowIcon(QIcon('images_/icons/icon.png'))
+        msgBox.setText("Welcome to the testing world.")
+        msgBox.setInformativeText("Press OK if you are ready.")
+        msgBox.setWindowTitle("Message")
+        self.on_button_click('images_/images/Welcome.jpg')
+        msgBox.setStandardButtons(QMessageBox.Ok)
+        self.info_label.setText('Now,\n  Press START Button  ')
+        ret_value = msgBox.exec_()
+        if ret_value == QMessageBox.Ok:
+            self.secondMessage()
+    ########################################################################################################
+    def secondMessage(self):
+        msgBox = QMessageBox()
+        msgBox.setWindowIcon(QIcon('images_/icons/icon.png'))
+        msgBox.setText("Press the PowerON buttons of PowerSupply and Multimeter to avoid delay.\n\nSet all the environment as shown in the image.\n\nRead the information carefully everytime.\n")
+        msgBox.setInformativeText("Then press the button.")
+        msgBox.setWindowTitle("Message")
+        msgBox.setStandardButtons(QMessageBox.Ok)
+        ret_value = msgBox.exec_()
+        if ret_value == QMessageBox.Ok:
+            self.title_label.setText('Preparation Test')
+            self.info_label.setText('Press START Button')
+            self.on_button_click('images_/images/PP1.jpg')
+    ########################################################################################################
     def on_button_click(self, file_path):
         if file_path:
             pixmap = QPixmap(file_path)
@@ -57,17 +171,6 @@ class App(QMainWindow):
                     self.info_label.setText('Power ON of the Powersupply and also Multimeter...\n and wait for 12 seconds.\n Press "Netzteil ON"')                    
                 else:
                     self.on_button_click('images_/icons/next_1.jpg')
-                    
-            # if self.start_button.text() == 'JUMPER OK':
-            #     reply = self.show_good_message('')
-            #     if reply == QMessageBox.Yes:
-            #         self.start_button.setText('STROM')
-            #         self.start_button.setEnabled(True)
-            #         self.powersupply.write('OUTPut '+self.PS_channel+',ON')
-            #         self.on_button_click('images_/images/PP16.jpg')
-            #         self.info_label.setText('Press STROM button')
-            #     else:
-            #         self.on_button_click('images_/images/PP17.jpg')
 
     def connect(self):
         if self.start_button.text() == 'START':
@@ -90,7 +193,7 @@ class App(QMainWindow):
             self.on_button_click('images_/icons/next.jpg')
         elif self.start_button.text()=='NEXT':
             self.start_button.setEnabled(False)
-            self.show_good_message('Wait for 5 seconds. Untill the Powersupply and Multimeter get SET')
+            self.show_good_message('Wait for 10 seconds. Untill the Powersupply and Multimeter get SET')
             self.start_button.setText('MULTI ON')
             self.info_label.setText("Press MULTI ON.\n\n You can see MULTIMETER Name on TextBox.")
             self.on_button_click('images_/images/PP9.jpg')
@@ -112,10 +215,22 @@ class App(QMainWindow):
             self.info_label.setText('wait 10 seconds')
             self.start_button.setText('Close J')
             self.on_button_click('images_/images/close_jumper.jpg')
+
         elif self.start_button.text()=='Close J':
             self.start_button.setEnabled(False)
-            self.show_good_message('CLOSE the Jumper with Soldering. \n If You Close then Press YES')
-            self.start_button.setText('STROM')
+            reply = self.show_good_message('CLOSE the Jumper with Soldering. \n If You Close then Press YES')
+            if reply == QMessageBox.Yes:                    
+                self.start_button.setText('STROM')
+                self.on_button_click('images_/images/PP8.jpg')
+                self.powersupply.write('OUTPut '+self.PS_channel+',ON')
+                self.info_label.setText('Press STROM button...\n and and Calculate the supply current\n after closed the JUMPER')                    
+            else:
+                self.on_button_click('images_/images/close_jumper.jpg')
+        elif self.start_button.text()=='STROM':
+            self.calc_voltage_before_jumper()
+            self.on_button_click('images_/images/R709_before_jumper.jpg')
+
+            
 
         # elif self.
 
@@ -185,7 +300,7 @@ class App(QMainWindow):
                 self.info_label.setText('\n \n \n \n Select DCV from AC/DC..!')
             else:
                 QMessageBox.information(self, 'Information', 'Supplying Current is either more or less. So please Swith OFF the PowerSupply, and Put back all the Euipment back.')
-                self.powersupply.write('OUTPut '+self.PS_channel+',OFF')
+
 
     def connect_multimeter(self):
         if not self.multimeter:
@@ -235,7 +350,7 @@ class App(QMainWindow):
         msgBox.setStandardButtons(QMessageBox.Yes | QMessageBox.No)        
         return msgBox.exec_()
     
-    
+
     def enable_button(self):
         self.timer1.stop()
         self.start_button.setEnabled(True)
