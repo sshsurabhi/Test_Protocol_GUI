@@ -17,7 +17,7 @@
    <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;&lt;br/&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
   </property>
   <property name="styleSheet">
-   <string notr="true">background-color: rgb(170, 170, 127);</string>
+   <string notr="true">background-color: rgb(142, 180, 179);</string>
   </property>
   <widget class="QWidget" name="centralwidget">
    <widget class="QLabel" name="image_label">

@@ -29,11 +29,17 @@ class App(QMainWindow):
         self.commands = ['i2c:scan', 'i2c:read:53:04:FC', 'i2c:write:53:', 'i2c:read:53:20:00', 'i2c:write:73:04', 'i2c:scan','i2c:write:21:0300','i2c:write:21:0100','i2c:write:21:01FF', 'i2c:write:73:01',
                     'i2c:scan', 'i2c:write:4F:06990918', 'i2c:write:4F:01F8', 'i2c:read:4F:1E:00']
         self.start_button.clicked.connect(self.connect)
-
         ########################################################################################################
         self.rm = visa.ResourceManager()
         self.multimeter = None
         self.powersupply = None
+
+
+        self.config_file = configparser.ConfigParser()
+        self.config_file.read('conf_igg.ini')
+        self.PS_channel = self.config_file.get('Power Supplies', 'Channel_set')
+        self.max_voltage = self.config_file.get('Power Supplies', 'Voltage_set')
+        self.max_current = self.config_file.get('Power Supplies', 'Current_set')
 
         self.value_edit.returnPressed.connect(self.load_voltage_current)
     def on_button_click(self, file_path):
@@ -95,8 +101,6 @@ class App(QMainWindow):
         elif self.start_button.text()=='STROM-I':
             self.calc_voltage_before_jumper()
         elif self.start_button.text()=='SPANNUNG':
-            # QMessageBox.information(self, 'Information', 'Supplying Current is either more or less. So please Swith OFF the PowerSupply, and Put back all the Euipment back.')
-            # self.powersupply.write('OUTPut '+self.PS_channel+',OFF')
             self.info_label.setText('Press "POWER OFF" button')
             self.on_button_click('images_/images/Start2.png')
             self.start_button.setText('POWER OFF')
@@ -122,38 +126,22 @@ class App(QMainWindow):
             
         ########################################################################################################
     def load_voltage_current(self):
-        if (self.vals_button.text() == 'CH' and self.value_edit.text() in ['ch1', 'CH1', 'Ch1', 'cH1']):
-            self.powersupply.write('INSTrument CH1')
-            self.PS_channel = self.value_edit.text()
+        if self.vals_button.text() == 'CH':
+            self.PS_channel = str(self.value_edit.text())
+            self.powersupply.write('INSTrument '+self.PS_channel)
+            self.config_file.set('Power Supplies', 'Channel_set', self.PS_channel)
             self.vals_button.setText('V')
+            self.value_edit.setText(self.max_voltage)
             self.info_label.setText('Write 30 in the Yellow Box next to "V" \n \n Press "Enter"\n You can check the value in the powersupply.')
-            self.value_edit.clear()
-            self.on_button_click('images_/images/PP7_1.jpg')
-            self.value_edit.setValidator(QRegExpValidator(QRegExp(r'^\d+(\.\d+)?$')))
-        elif (self.vals_button.text() == 'CH' and self.value_edit.text() in ['ch2', 'CH2', 'Ch2', 'cH2']):
-            self.powersupply.write('INSTrument CH2')
-            self.PS_channel = self.value_edit.text()
-            self.vals_button.setText('V')
-            self.info_label.setText('Write 30 in the Yellow Box next to "V" \n \n Press "Enter"\n You can check the value in the powersupply.')
-            self.value_edit.clear()
-            self.on_button_click('images_/images/PP7_1.jpg')
-            self.value_edit.setValidator(QRegExpValidator(QRegExp(r'^\d+(\.\d+)?$')))
-        elif (self.vals_button.text() == 'CH' and self.value_edit.text() in ['ch3', 'CH3', 'Ch3', 'cH3']):
-            self.powersupply.write('INSTrument CH3')
-            self.PS_channel = self.value_edit.text()
-            self.vals_button.setText('V')
-            self.info_label.setText('Write 30 in the Yellow Box next to "V" \n \n Press "Enter"\n You can check the value in the powersupply.\n You can see the "Channel Selection" in the powersupply.')
-            self.value_edit.clear()
             self.on_button_click('images_/images/PP7_1.jpg')
             self.value_edit.setValidator(QRegExpValidator(QRegExp(r'^\d+(\.\d+)?$')))
         elif self.vals_button.text() == 'V':
-            self.max_voltage =  self.value_edit.text()
+            self.max_voltage =  str(self.value_edit.text())
+            self.config_file.set('Power Supplies', 'Voltage_set', self.max_voltage)
             self.powersupply.write(self.PS_channel+':VOLTage ' + self.max_voltage)
-            # self.textBrowser.append(self.powersupply.query(self.PS_channel+':VOLTage?'))
-            max_voltage = self.max_voltage
             self.vals_button.setText('I')
+            self.value_edit.setText(self.max_current)
             self.info_label.setText('Enter 0.5 in the box next to I\n\n Press "Enter".\n Check the value change in the Powersupply.')
-            self.value_edit.clear()
             self.on_button_click('images_/images/PP7_2.jpg')
         elif self.vals_button.text() == 'I':
             self.max_current = self.value_edit.text()
@@ -168,21 +156,6 @@ class App(QMainWindow):
             self.value_edit.setStyleSheet("")
             self.value_edit.clear()
             self.on_button_click('images_/images/PP8.jpg')
-        # elif self.vals_button.text() == 'Tolz V':
-        #     self.volt_toleranz = self.value_edit.text()
-        #     self.textBrowser.append(self.volt_toleranz)
-        #     self.value_edit.clear()
-        #     self.info_label.setText('Enter 0.5 in the box next to I')
-        #     self.vals_button.setText('Tolz I')
-        #     self.on_button_click('images_/images/PP8_1.jpg')
-        # elif self.vals_button.text() == 'Tolz I':
-        #     self.curr_toleranz = self.value_edit.text()
-        #     self.textBrowser.append(self.curr_toleranz)
-        #     self.value_edit.setEnabled(False)
-        #     self.start_button.setEnabled(True)
-        #     self.info_label.setText('Press MESS V_I')
-        #     self.start_button.setText('MESS V_I')
-        #     self.on_button_click('images_/images/PP17.jpg')
         else:
             self.textBrowser.append('Wrong Input')
 
@@ -239,6 +212,7 @@ class App(QMainWindow):
                 self.info_label.setText('Write CH1 in the Yellow Box (Highlighted)\n \n next to CH \n\n Press "ENTER"')
                 self.value_edit.setEnabled(True)
                 self.vals_button.setText('CH')
+                self.value_edit.setText(self.PS_channel)
                 self.on_button_click('images_/images/PP7.jpg')
             except visa.errors.VisaIOError:
                 QMessageBox.information(self, "PowerSupply Connection", "PowerSupply is not present at the given IP Address.")
@@ -260,6 +234,8 @@ class App(QMainWindow):
         self.title_label.setText('Powersupply Test')
         msgBox.setStandardButtons(QMessageBox.Yes | QMessageBox.No)        
         return msgBox.exec_()
+    
+    
     def enable_button(self):
         self.timer1.stop()
         self.start_button.setEnabled(True)
