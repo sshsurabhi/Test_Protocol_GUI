@@ -82,7 +82,9 @@ class App(QMainWindow):
         self.start_button.clicked.connect(self.connect)
         # self.timer = QTimer(self)
         # self.timer.timeout.connect(self.update_time_label)
-        # self.timer.start(1000) 
+        # self.timer.start(1000)
+
+    
         self.rm = visa.ResourceManager()
         self.multimeter = None
         self.powersupply = None
@@ -204,7 +206,7 @@ class App(QMainWindow):
                     self.info_label.setText('Power ON of the Powersupply and also Multimeter...\n and wait for 5 seconds.\n Press "Netzteil ON"')                    
                 else:
                     self.on_button_click('images_/icons/3.jpg')
-                    
+
             if self.start_button.text() == 'JUMPER OK':
                 reply = self.jumper_close()
                 if reply == QMessageBox.Yes:

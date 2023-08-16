@@ -17,7 +17,7 @@
    <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;&lt;br/&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
   </property>
   <property name="styleSheet">
-   <string notr="true">background-color: rgb(79, 79, 79);</string>
+   <string notr="true">background-color: rgb(170, 170, 127);</string>
   </property>
   <widget class="QWidget" name="centralwidget">
    <widget class="QLabel" name="image_label">
@@ -140,7 +140,7 @@ selection-color: rgb(0, 85, 255);</string>
       <string notr="true"/>
      </property>
      <property name="text">
-      <string>Netzteil ON</string>
+      <string>START</string>
      </property>
      <property name="checkable">
       <bool>false</bool>
@@ -719,8 +719,6 @@ selection-color: rgb(0, 85, 255);</string>
    </property>
   </action>
  </widget>
- <resources>
-  <include location="../images_/source.qrc"/>
- </resources>
+ <resources/>
  <connections/>
 </ui>
