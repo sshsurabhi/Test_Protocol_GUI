@@ -212,7 +212,7 @@ class App(QMainWindow):
             self.result_edit.setText(str(voltage_before_jumper))
         elif self.start_button.text()=='POWER OFF':
             self.powersupply.write('OUTPut '+self.PS_channel+',OFF')
-            self.info_label.setText('wait 10 seconds')
+            self.info_label.setText('press "Close J" button\n and close the JUMPER with Soldering \n wait 10 seconds')
             self.start_button.setText('Close J')
             self.on_button_click('images_/images/close_jumper.jpg')
 
@@ -228,17 +228,7 @@ class App(QMainWindow):
                 self.on_button_click('images_/images/close_jumper.jpg')
         elif self.start_button.text()=='STROM':
             self.calc_voltage_before_jumper()
-            self.on_button_click('images_/images/R709_before_jumper.jpg')
-
-            
-
-        # elif self.
-
-            
-
-        
-
-            
+            self.on_button_click('images_/images/R709_before_jumper.jpg')            
         ########################################################################################################
     def load_voltage_current(self):
         if self.vals_button.text() == 'CH':
@@ -350,6 +340,69 @@ class App(QMainWindow):
         msgBox.setStandardButtons(QMessageBox.Yes | QMessageBox.No)        
         return msgBox.exec_()
     
+    def on_cal_voltage_current(self):
+        pass
+    ########################################################################################################
+    def selct_AC_DC_box(self):
+        self.test_button.setEnabled(True)
+        self.AC_DC_box.setEnabled(False)
+    ########################################################################################################
+    def update_time_label(self):
+        current_time = QTime.currentTime().toString(Qt.DefaultLocaleLongDate)
+        current_date = QDate.currentDate().toString(Qt.DefaultLocaleLongDate)
+        self.time_label.setText(f"{current_time} - {current_date}")
+        # return current_date, current_time
+    ########################################################################################################
+    def update_com_ports(self, com_ports):
+        self.port_box.clear()
+        self.port_box.addItems(com_ports)
+    ########################################################################################################
+    def connect_or_disconnect_serial_port(self):
+        if self.serial_port is None:
+            com_port = self.port_box.currentText()            # Get the selected com port and baud rate
+            baud_rate = int(self.baudrate_box.currentText())
+            self.serial_port = serial.Serial(com_port, baud_rate, timeout=1)            # Create a new serial port object and open it
+            self.port_box.setEnabled(False)  # Disable the combo boxes and change the button text
+            self.start_button.setText('SERIAL TEST')
+            self.start_button.setEnabled(True)
+            self.connect_button.setEnabled(True)
+            self.baudrate_box.setEnabled(False)
+            self.connect_button.setText('Disconnect')
+            self.textBrowser.append('Serial Communication Connected')
+            self.refresh_button.setEnabled(False)
+        else:
+            self.serial_port.close()            # Close the serial port
+            self.serial_port = None
+            self.connect_button.setEnabled(True)
+            self.port_box.setEnabled(True)            # Enable the combo boxes and change the button text
+            self.baudrate_box.setEnabled(True)
+            self.refresh_button.setEnabled(True)
+            self.connect_button.setText('Connect')
+            self.textBrowser.append('Communication Disconnected')
+    ########################################################################################################
+    def refresh_connect(self):
+        self.serial_thread.quit()
+        self.serial_thread.wait()
+        self.serial_thread.start()
+    ########################################################################################################
+    def on_widget_button_clicked(self, message):
+        self.textBrowser.append(message)
+    def update_lineinsert(self, response):
+            self.id_Edit.setText(response)
+    ########################################################################################################
+    def start_process(self):
+        if self.thread is None or not self.thread.isRunning():
+            QMessageBox.information(self, "Process Started", "Process has been started.")
+            self.thread = WorkerThread(self.commands, self.serial_port)
+            self.thread.result_signal.connect(self.on_widget_button_clicked)
+            self.thread.process_completed.connect(self.process_completed)
+            self.thread.response_signal.connect(self.update_lineinsert)
+            self.thread.start()
+        else:
+            QMessageBox.warning(self, "Process In Progress", "Process is already running.")
+    ########################################################################################################
+    def process_completed(self):
+        QMessageBox.information(self, "Process Completed", "Process has been completed.")
 
     def enable_button(self):
         self.timer1.stop()
