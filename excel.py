@@ -67,45 +67,130 @@
     
 #     modify_excel(excel_file, sheet_name, modifications)
 
-import sys
-from PyQt5.QtWidgets import QApplication, QWidget, QMessageBox, QVBoxLayout, QPushButton
-from PyQt5.QtCore import QTimer
+# import sys
+# from PyQt5.QtWidgets import QApplication, QWidget, QMessageBox, QVBoxLayout, QPushButton
+# from PyQt5.QtCore import QTimer
 
-class MyApp(QWidget):
-    def __init__(self):
-        super().__init__()
-        self.initUI()
+# class MyApp(QWidget):
+#     def __init__(self):
+#         super().__init__()
+#         self.initUI()
 
-    def initUI(self):
-        layout = QVBoxLayout()
+#     def initUI(self):
+#         layout = QVBoxLayout()
 
-        self.show_message_button = QPushButton('Show Message')
-        self.show_message_button.clicked.connect(self.show_message)
+#         self.show_message_button = QPushButton('Show Message')
+#         self.show_message_button.clicked.connect(self.show_message)
 
-        layout.addWidget(self.show_message_button)
+#         layout.addWidget(self.show_message_button)
 
-        self.setLayout(layout)
-        self.setWindowTitle('PyQt5 Message Dialog Example')
+#         self.setLayout(layout)
+#         self.setWindowTitle('PyQt5 Message Dialog Example')
 
-    def show_message(self):
-        msg_box = QMessageBox(self)
-        msg_box.setWindowTitle('Information')
-        msg_box.setIcon(QMessageBox.Information)
-        msg_box.setText('This is a message that will stay visible for a minimum of 5 seconds.')
-        msg_box.setStandardButtons(QMessageBox.Ok)
-        msg_box.setDefaultButton(QMessageBox.Ok)
+#     def show_message(self):
+#         msg_box = QMessageBox(self)
+#         msg_box.setWindowTitle('Information')
+#         msg_box.setIcon(QMessageBox.Information)
+#         msg_box.setText('This is a message that will stay visible for a minimum of 5 seconds.')
+#         msg_box.setStandardButtons(QMessageBox.Ok)
+#         msg_box.setDefaultButton(QMessageBox.Ok)
 
-        ok_button = msg_box.button(QMessageBox.Ok)
-        ok_button.setEnabled(False)  # Disable the OK button initially
+#         ok_button = msg_box.button(QMessageBox.Ok)
+#         ok_button.setEnabled(False)  # Disable the OK button initially
 
-        timer = QTimer(self)
-        timer.timeout.connect(lambda: ok_button.setEnabled(True))
-        timer.start(5000)  # 5000 ms (5 seconds)
+#         timer = QTimer(self)
+#         timer.timeout.connect(lambda: ok_button.setEnabled(True))
+#         timer.start(5000)  # 5000 ms (5 seconds)
 
-        msg_box.exec_()
+#         msg_box.exec_()
 
-if __name__ == '__main__':
-    app = QApplication(sys.argv)
-    window = MyApp()
-    window.show()
-    sys.exit(app.exec_())
+# if __name__ == '__main__':
+#     app = QApplication(sys.argv)
+#     window = MyApp()
+#     window.show()
+#     sys.exit(app.exec_())
+
+# import time
+
+# def measure_dc_voltage(channel):
+#     # Simulate measuring DC voltage on the specified channel
+#     voltage = 5.0  # Replace with actual measurement code
+#     return voltage
+
+# def measure_ac_voltage(channel):
+#     # Simulate measuring AC voltage on the specified channel
+#     voltage = 220.0  # Replace with actual measurement code
+#     return voltage
+
+# def main():
+#     num_dc_measurements = 4
+#     num_ac_measurements = 4
+
+#     # First set of DC voltage measurements
+#     for i in range(num_dc_measurements):
+#         dc_voltage = measure_dc_voltage(i + 1)
+#         print(f"DC Voltage Measurement {i+1}: {dc_voltage} V")
+#         time.sleep(10)
+
+#     # First set of AC voltage measurements
+#     for i in range(num_ac_measurements):
+#         ac_voltage = measure_ac_voltage(i + 1)
+#         print(f"AC Voltage Measurement {i+1}: {ac_voltage} V")
+#         time.sleep(10)
+
+#     print("Arranging wire settings...")
+#     time.sleep(15)
+
+#     # Second set of DC voltage measurements
+#     for i in range(3):
+#         dc_voltage = measure_dc_voltage(i + 1)
+#         print(f"DC Voltage Measurement {i+5}: {dc_voltage} V")
+#         time.sleep(10)
+
+#     # Second set of AC voltage measurements
+#     for i in range(3):
+#         ac_voltage = measure_ac_voltage(i + 1)
+#         print(f"AC Voltage Measurement {i+5}: {ac_voltage} V")
+#         time.sleep(10)
+
+# if __name__ == "__main__":
+#     main()
+
+
+import time
+
+# Simulate the function to measure DC voltage
+def measure_dc_voltage(component_number):
+    # Replace this with your actual code to measure DC voltage using the multimeter
+    print(f"Measuring DC Voltage for component {component_number}")
+
+# Simulate the function to measure AC voltage
+def measure_ac_voltage(component_number):
+    # Replace this with your actual code to measure AC voltage using the multimeter
+    print(f"Measuring AC Voltage for component {component_number}")
+
+# Main function to perform measurements
+def main():
+    for component in range(1, 15):
+        time.sleep(10)
+        if component <= 4:
+            measure_dc_voltage(component)
+        elif 4 < component <= 8:
+            measure_ac_voltage(component)
+        
+        # time.sleep(10)  # 10 seconds time difference between measurements
+
+        if component == 4:
+            print("Arrange small wire settings...")
+            time.sleep(15)  # 15 seconds for arranging wire settings
+        
+        if 8 < component <= 11:
+            measure_dc_voltage(component)
+        elif 11 < component <= 14:
+            measure_ac_voltage(component)
+
+        time.sleep(10)  # 10 seconds time difference between measurements
+
+# Call the main function when the button is pressed in your PyQt5 app
+if __name__ == "__main__":
+    main()

@@ -114,9 +114,9 @@ selection-color: rgb(0, 85, 255);</string>
    <widget class="QWidget" name="widget" native="true">
     <property name="geometry">
      <rect>
-      <x>80</x>
-      <y>80</y>
-      <width>631</width>
+      <x>170</x>
+      <y>90</y>
+      <width>421</width>
       <height>101</height>
      </rect>
     </property>
@@ -149,7 +149,7 @@ selection-color: rgb(0, 85, 255);</string>
     <widget class="QPushButton" name="test_button">
      <property name="geometry">
       <rect>
-       <x>530</x>
+       <x>315</x>
        <y>0</y>
        <width>101</width>
        <height>101</height>
@@ -168,31 +168,11 @@ selection-color: rgb(0, 85, 255);</string>
      <property name="text">
       <string>GO</string>
      </property>
+     <property name="checkable">
+      <bool>true</bool>
+     </property>
      <property name="autoDefault">
       <bool>false</bool>
-     </property>
-    </widget>
-    <widget class="QLineEdit" name="result_edit">
-     <property name="geometry">
-      <rect>
-       <x>320</x>
-       <y>53</y>
-       <width>201</width>
-       <height>41</height>
-      </rect>
-     </property>
-     <property name="font">
-      <font>
-       <pointsize>11</pointsize>
-       <weight>75</weight>
-       <bold>true</bold>
-      </font>
-     </property>
-     <property name="styleSheet">
-      <string notr="true">alternate-background-color: rgb(80, 80, 60);</string>
-     </property>
-     <property name="alignment">
-      <set>Qt::AlignCenter</set>
      </property>
     </widget>
     <widget class="QLineEdit" name="value_edit">
@@ -309,52 +289,6 @@ selection-color: rgb(0, 85, 255);</string>
      </property>
      <property name="alignment">
       <set>Qt::AlignCenter</set>
-     </property>
-    </widget>
-    <widget class="QComboBox" name="AC_DC_box">
-     <property name="geometry">
-      <rect>
-       <x>390</x>
-       <y>6</y>
-       <width>131</width>
-       <height>41</height>
-      </rect>
-     </property>
-     <property name="font">
-      <font>
-       <pointsize>10</pointsize>
-       <weight>75</weight>
-       <bold>true</bold>
-      </font>
-     </property>
-    </widget>
-    <widget class="QLabel" name="label">
-     <property name="geometry">
-      <rect>
-       <x>320</x>
-       <y>6</y>
-       <width>71</width>
-       <height>41</height>
-      </rect>
-     </property>
-     <property name="font">
-      <font>
-       <pointsize>12</pointsize>
-       <weight>75</weight>
-       <bold>true</bold>
-      </font>
-     </property>
-     <property name="frameShape">
-      <enum>QFrame::Panel</enum>
-     </property>
-     <property name="frameShadow">
-      <enum>QFrame::Sunken</enum>
-     </property>
-     <property name="lineWidth">
-      <number>2</number>
-     </property>
-     <property name="text">
-      <string>DC/AC</string>
      </property>
     </widget>
    </widget>
@@ -649,6 +583,35 @@ selection-color: rgb(0, 85, 255);</string>
      </property>
      <property name="checkable">
       <bool>false</bool>
+     </property>
+    </widget>
+    <widget class="QLabel" name="result_label">
+     <property name="geometry">
+      <rect>
+       <x>396</x>
+       <y>2</y>
+       <width>211</width>
+       <height>91</height>
+      </rect>
+     </property>
+     <property name="font">
+      <font>
+       <pointsize>12</pointsize>
+       <weight>75</weight>
+       <bold>true</bold>
+      </font>
+     </property>
+     <property name="frameShape">
+      <enum>QFrame::Panel</enum>
+     </property>
+     <property name="lineWidth">
+      <number>2</number>
+     </property>
+     <property name="text">
+      <string/>
+     </property>
+     <property name="alignment">
+      <set>Qt::AlignCenter</set>
      </property>
     </widget>
    </widget>
