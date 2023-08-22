@@ -413,6 +413,7 @@ class App(QMainWindow):
                 self.start_button.setEnabled(True)
             self.test_index += 1
         else:
+            
             self.image_timer.stop()
 
     def DC_voltage_R709(self):
