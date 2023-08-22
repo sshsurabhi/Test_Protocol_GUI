@@ -4,6 +4,7 @@ from PyQt5 import uic
 from PyQt5.QtCore import *
 from PyQt5.QtGui import *
 from PyQt5.QtWidgets import *
+from popup import MyDialog
 ##################################################################################################################################
 class WorkerThread(QThread):
     process_completed = pyqtSignal()
@@ -62,7 +63,7 @@ class App(QMainWindow):
     def __init__(self):
         super(App, self).__init__()
         uic.loadUi("UI/Test_App.ui", self)
-        self.setWindowIcon(QIcon('images_/icons/2.jpg'))
+        self.setWindowIcon(QIcon('images_/icons/Moewe.jpg'))
         self.setFixedSize(self.size())
         self.setStatusTip('Moewe Optik Gmbh. 2023')
         self.show()
@@ -106,7 +107,9 @@ class App(QMainWindow):
         self.firstMessage()
         ########################################################################################################
         # self.save_button.clicked.connect(self.create_ini_file)
-
+        self.test_images = ['images_/images/R700.jpg','images_/images/R709_before_jumper.jpg','images_/images/R700_DC.jpg', 'images_/images/PP2.png','images_/images/C443.jpg','images_/images/C442.jpg','images_/images/C441.jpg','images_/images/C412.jpg',
+                            'images_/images/C430.jpg','images_/images/C443_1.jpg','images_/images/C442_1.jpg','images_/images/C441_1.jpg','images_/images/C412_1.jpg','images_/images/C430_1.jpg', 'images_/images/R709.jpg',]
+        self.test_index = 0
         self.DCV_readings = [0,0,0,0,0,0,0]
         self.ACV_readings = [0,0,0,0,0,0,0]
 
@@ -187,28 +190,31 @@ class App(QMainWindow):
         elif self.start_button.text()=='SPANNUNG':
             self.info_label.setText('Press "POWER OFF" button')
             self.on_button_click('images_/images/Start2.png')
-            self.start_button.setText('POWER OFF')
+            self.start_button.setEnabled(False)
+            QMessageBox.information(self, 'Information', 'Place the Multimeter Lead at the Component Showing in the Imgae, and Wait for 5 Seconds to read the Voltage..')
+            time.sleep(5)
             self.voltage_before_jumper = self.multimeter.query('MEAS:VOLT:DC?')
+            self.start_button.setEnabled(True)
+            self.start_button.setText('POWER OFF')
             self.result_label.setText('Voltage before Jumper\n'+str(float(self.voltage_before_jumper))+'V')
         elif self.start_button.text()=='POWER OFF':
             self.powersupply.write('OUTPut '+self.PS_channel+',OFF')
             self.info_label.setText('press "Close J" button\n and close the JUMPER with Soldering \n wait 10 seconds')
             self.start_button.setText('Close J')
             self.on_button_click('images_/images/close_jumper.jpg')
-
         elif self.start_button.text()=='Close J':
-            # self.start_button.setEnabled(False)
             reply = self.show_good_message('CLOSE the Jumper with Soldering. \n If You Close then Press YES')
             if reply == QMessageBox.Yes:                    
                 self.start_button.setText('STROM')
                 self.on_button_click('images_/images/PP8.jpg')
                 self.powersupply.write('OUTPut '+self.PS_channel+',ON')
-                self.info_label.setText('Press STROM button...\n and and Calculate the supply current\n after closed the JUMPER')                    
+                self.info_label.setText('Press STROM button...\n and and Calculate the supply current\n after closed the JUMPER')                 
             else:
                 self.on_button_click('images_/images/close_jumper.jpg')
         elif self.start_button.text()=='STROM':
             self.calc_voltage_before_jumper()
-            self.on_button_click('images_/images/R709_before_jumper.jpg')            
+        elif self.start_button.text() == 'NEXT':
+            self.on_button_click()
         ########################################################################################################
     def load_voltage_current(self):
         if self.vals_button.text() == 'CH':
@@ -236,7 +242,7 @@ class App(QMainWindow):
             self.powersupply.write('OUTPut '+self.PS_channel+',ON')
             self.value_edit.setEnabled(False)
             self.start_button.setEnabled(True)
-            self.info_label.setText('Press STROM-I') # modify here'
+            self.info_label.setText('Press STROM-I\n Check the "CUrrent" Value.') # modify here'
             self.start_button.setText('STROM-I')
             self.value_edit.setStyleSheet("")
             self.value_edit.clear()
@@ -246,7 +252,6 @@ class App(QMainWindow):
 
     def calc_voltage_before_jumper(self):
         current = float(self.powersupply.query('MEASure:CURRent? '+self.PS_channel))        
-        self.textBrowser.append('Current: '+str(current))
         if self.start_button.text() == 'STROM-I':
             self.result_label.setText('Current before Jumper\n'+str(current)+'A')
             if 0.04 <= current <= 0.06:
@@ -263,10 +268,9 @@ class App(QMainWindow):
         elif self.start_button.text() == 'STROM':
             self.result_label.setText('Current After Jumper\n'+str(current)+'A')
             if 0.09 <= current <= 0.15:
-                self.start_button.setEnabled(False)
                 self.current_after_jumper = current
-                self.on_button_click('images_/images/sel_DC_in_multimeter.jpg')
-                # QMessageBox.information(self, "Information", "Now Everything is perfect. Please be care full with each and every step from here.")
+                QMessageBox.information(self, "Information", "Now Everything is perfect. Please be care full with each and every step from here.")
+                self.on_button_click('images_/images/R709.jpg')
                 self.info_label.setText('\n \n Press TEST V Button to run the Voltage Tests. Be careful.')
                 self.test_button.setText('TEST-V')
                 self.test_button.setEnabled(True)
@@ -324,152 +328,232 @@ class App(QMainWindow):
     
 
 
-def on_cal_voltage_current(self):
-    time.sleep(5)
-    QMessageBox.information(self, "Information", "Now Everything is perfect. Please be careful with each and every step from here.")
+    def on_cal_voltage_current(self):
+        self.start_button.setEnabled(False)
+        self.image_timer = QTimer(self)
+        self.image_timer.timeout.connect(self.change_image)
+        self.image_timer.start(5000)
 
-    self.on_button_click('images_/images/R709_before_jumper.jpg')
-    self.info_label.setText('Calculate Voltage at this component.\n It should be in between 3.28 and 3.38.\n Keep the Ground at the specified connection.\nwait at least 5 seconds to get the readings.')
-    time.sleep(5)
-    self.DCV_readings[0] = self.multimeter.query('MEAS:VOLT:DC?')
-    # ... your commented-out code ...
+    def change_image(self):
+        if self.test_index < len(self.test_images):
+            image_name = self.test_images[self.test_index]
+            self.on_button_click(image_name)
+            self.info_label.setText('Calculate Voltage at this component.\n It shouzld be in between 3.28 and 3.38.\n Keep the Ground at the specified connection.\nwait at least 5 seconds to get the readings.')
+            if self.test_index == 0:                
+                self.info_label.setText('Calculate Voltage at this R700 component. Wait 5 seconds')
+                time.sleep(5)
+                attempt = 0
+                x = self.DC_voltage_R709()
+                while attempt < 2 and not (3.28 < x < 3.38):
+                    attempt += 1
+                    time.sleep(5)
+                    x = self.DC_voltage_R709()
+                if 3.28 < x < 3.38:
+                    self.info_label.setText('Calculate voltage at R700')
+                else:
+                    self.info_label.setText('Mesurement is not in range.')
+            elif self.test_index == 1:
+                self.info_label.setText('Measure at this R709 Component. wait 5 seconds to get the readings.')
+                time.sleep(5)
+                x = self.DC_voltage_R700()
+                # self.config_file.set('Powersupply Test', 'dcv b/w gnd - r709', x)
+            elif self.test_index == 2:
+                time.sleep(2)
+                self.multimeter.query('MEAS:VOLT:AC?')
+                self.info_label.setText('Measure AC Voltage at R700. \n Careful.')
+                time.sleep(5)
+                self.ACV_readings[0] = self.AC_voltage_R709_R700()
+            elif self.test_index == 3:
+                self.info_label.setText('Measure DC voltage at C443.. \n check the image for component placement.')
+                time.sleep(5)
+                self.ACV_readings[1] = self.AC_voltage_R709_R700()
+            elif self.test_index == 4:
+                self.show_good_message('Change the Ground Connection according to the Image.')
+            elif self.test_index == 5:
+                self.info_label.setText('Measure DC voltage at C442.. \n ')
+                time.sleep(5)
+                self.DC_voltage_C443()
+            elif self.test_index == 6:
+                self.info_label.setText('Measure DC voltage at C441.. \n ')
+                time.sleep(5)
+                self.DCV_readings[3] = self.DC_voltage_C442_C441()
+            elif self.test_index == 7:
+                self.info_label.setText('Measure DC voltage at C412.. \n ')
+                time.sleep(5)
+                self.DCV_readings[4] = self.DC_voltage_C442_C441()
+            elif self.test_index == 8:
+                self.info_label.setText('Measure DC voltage at C430.. \n ')
+                self.DCV_readings[5] = self.DC_voltage_C412()
+                time.sleep(5)
+            elif self.test_index == 9:
+                self.info_label.setText('Measure AC voltage at C443.. \n ')
+                self.DCV_readings[6] = self.DC_voltage_C430()
+                time.sleep(5)            
+            elif self.test_index == 10:
+                self.info_label.setText('Measure AC voltage at C442.. \n ')
+                self.ACV_readings[2] = self.AC_voltage_C443()
+                time.sleep(5)
+            elif self.test_index == 11:
+                self.info_label.setText('Measure AC voltage at C441.. \n ')
+                self.ACV_readings[3] = self.AC_voltage_C442_C441()
+                time.sleep(5)
+            elif self.test_index == 12:
+                self.info_label.setText('Measure AC voltage at C412.. \n ')
+                self.ACV_readings[4] = self.AC_voltage_C442_C441()
+                time.sleep(5)
+            elif self.test_index == 13:
+                self.info_label.setText('Measure AC voltage at C430.. \n ')
+                self.ACV_readings[5] = self.AC_voltage_C412_C430()
+                time.sleep(5)
+            elif self.test_index == 14:
+                self.info_label.setText('All Measurements Complete... \n ')
+                self.ACV_readings[6] = self.AC_voltage_C412_C430()
+                self.test_button.setEnabled(False)
+                self.start_button.setText('NEXT')
+                self.start_button.setEnabled(True)
+            self.test_index += 1
+        else:
+            self.image_timer.stop()
 
-    self.on_button_click('images_/images/R700.jpg')
-    self.info_label.setText('Calculate Voltage at this component.\n It should be in between 4.98 and 5.08.\n Keep the Ground at the specified connection.\nwait at least 5 seconds to get the readings.')
-    time.sleep(10)
-    self.DCV_readings[1] = self.multimeter.query('MEAS:VOLT:DC?')
-    # ... your commented-out code ...
+    def DC_voltage_R709(self):
+        self.DCV_readings[0] = float(self.multimeter.query('MEAS:VOLT:DC?'))
+        if 3.28 <= self.DCV_readings[0] <= 3.38:
+            self.textBrowser.append('DC Voltage at R709 Component'+str(self.DCV_readings[0]))
+            self.result_label.setStyleSheet("background-color: green;")
+            self.result_label.setText('DC VOltage @R709\n'+str(self.DCV_readings[0]))
+        else:
+            self.textBrowser.append('DC Voltage at R709 Component'+str(self.DCV_readings[0]))
+            self.result_label.setStyleSheet("background-color: red;")
+            self.result_label.setText('DC VOltage @R709\n'+str(self.DCV_readings[0]))
+            QMessageBox.information(self, "Information", "Now Everything is perfect. Please be care full with each and every step from here.")
+        QMessageBox.information(self, "Information", "Check the Image to measure component.")
+        return self.DCV_readings[0]
+    
+    
+    def DC_voltage_R700(self):
+        self.DCV_readings[1] = float(self.multimeter.query('MEAS:VOLT:DC?'))
+        if 4.98 <= self.DCV_readings[1] <= 5.08:
+            self.textBrowser.append('DC Voltage at R700 Component'+str(self.DCV_readings[1]))
+            self.result_label.setStyleSheet("background-color: green;")
+            self.result_label.setText('DC VOltage @R700\n'+str(float(self.DCV_readings[1])))
+        else:
+            self.textBrowser.append('DC Voltage at R700 Component'+str(self.DCV_readings[1]))
+            self.result_label.setStyleSheet("background-color: red;")
+            self.result_label.setText('DC VOltage @R700\n'+str(self.DCV_readings[1]))
+            QMessageBox.information(self, "Information", "Result has been different with Estimated. Please try all results one more time.")
+        QMessageBox.information(self, "Information", "Check the Image to measure component.")
+        return self.DCV_readings[1]
 
-    # Call on_button_click multiple times
-    self.on_button_click('images_/images/C443.jpg')
-    self.info_label.setText('Calculate Voltage at this component.\n It should be in between 4.98 and 5.08.\n Keep the Ground at the specified connection.\nwait at least 5 seconds to get the readings.')
-    time.sleep(10)
-    self.ACV_readings[0] = self.multimeter.query('MEAS:VOLT:AC?')
-    # ... your code ...
+    def AC_voltage_R709_R700(self):
+        voltage = float(self.multimeter.query('MEAS:VOLT:AC?'))
+        if voltage <= 0.01:
+            self.textBrowser.append('DC Voltage at R709/R700 Component'+str(voltage))
+            self.result_label.setStyleSheet("background-color: green;")
+            self.result_label.setText('DC VOltage @R709\n'+str(voltage))
+        else:
+            self.textBrowser.append('DC Voltage at R709/R700 Component'+str(voltage))
+            self.result_label.setStyleSheet("background-color: red;")
+            self.result_label.setText('DC VOltage @R709 or @R700\n'+str(voltage))
+            QMessageBox.information(self, "Information", "Now Everything is perfect. Please be care full with each and every step from here.")   
+        QMessageBox.information(self, "Information", "Check the Image to measure component.")
+        return voltage
 
-    self.on_button_click('images_/images/C442.jpg')
-    self.info_label.setText('Calculate Voltage at this component.\n It should be in between 4.98 and 5.08.\n Keep the Ground at the specified connection.\nwait at least 5 seconds to get the readings.')
-    time.sleep(10)
-    self.ACV_readings[1] = self.multimeter.query('MEAS:VOLT:AC?')
-    # ... your code ...
+    def DC_voltage_C443(self):
+        self.DCV_readings[2] = float(self.multimeter.query('MEAS:VOLT:DC?'))
+        if 11.95 <= self.DCV_readings[2] <= 12.05:
+            self.textBrowser.append('DC Voltage at C442 Component'+str(self.DCV_readings[2]))
+            self.result_label.setStyleSheet("background-color: green;")
+            self.result_label.setText('DC VOltage @C442\n'+str(self.DCV_readings[2]))
+        else:
+            self.textBrowser.append('DC Voltage at C442 Component'+str(self.DCV_readings[2]))
+            self.result_label.setStyleSheet("background-color: red;")
+            self.result_label.setText('DC VOltage @C442\n'+str(self.DCV_readings[2]))
+            QMessageBox.information(self, "Information", "Now Everything is perfect. Please be care full with each and every step from here.")
+        QMessageBox.information(self, "Information", "Check the Image to measure component.")
 
-    # ... continue with the remaining calls to on_button_click ...
+    def DC_voltage_C442_C441(self):
+        voltage = float(self.multimeter.query('MEAS:VOLT:DC?'))
+        if 4.95 <= voltage <= 5.05:
+            self.textBrowser.append('DC Voltage at C441 Component'+str(voltage))
+            self.result_label.setStyleSheet("background-color: green;")
+            self.result_label.setText('DC VOltage @R709\n'+str(voltage))
+        else:
+            self.textBrowser.append('DC Voltage at C441 Component'+str(voltage))
+            self.result_label.setStyleSheet("background-color: red;")
+            self.result_label.setText('DC VOltage @C441\n'+str(voltage))
+            QMessageBox.information(self, "Information", "Now Everything is perfect. Please be care full with each and every step from here.")
+        QMessageBox.information(self, "Information", "Check the Image to measure component.")
+        return voltage
+    def DC_voltage_C412(self):
+        voltage = float(self.multimeter.query('MEAS:VOLT:DC?'))
+        if 4.98 <= voltage <= 5.02:
+            self.textBrowser.append('DC Voltage at C412 Component'+str(voltage))
+            self.result_label.setStyleSheet("background-color: green;")
+            self.result_label.setText('DC VOltage @R709\n'+str(voltage))
+        else:
+            self.textBrowser.append('DC Voltage at C412 Component'+str(voltage))
+            self.result_label.setStyleSheet("background-color: red;")
+            self.result_label.setText('DC VOltage @C412\n'+str(voltage))
+            QMessageBox.information(self, "Information", "Now Everything is perfect. Please be care full with each and every step from here.")
+        QMessageBox.information(self, "Information", "Check the Image to measure component.")
+        return voltage
 
-    print('dcv', self.DCV_readings)
-    print('acv', self.ACV_readings)
+    def DC_voltage_C430(self):
+        voltage = float(self.multimeter.query('MEAS:VOLT:DC?'))
+        if 2.028 <= voltage <= 2.068:
+            self.textBrowser.append('DC Voltage at C430 Component'+str(voltage))
+            self.result_label.setStyleSheet("background-color: green;")
+            self.result_label.setText('DC VOltage @C430\n'+str(voltage))
+        else:
+            self.textBrowser.append('DC Voltage at C430 Component'+str(voltage))
+            self.result_label.setStyleSheet("background-color: red;")
+            self.result_label.setText('DC VOltage @C430\n'+str(voltage))
+            QMessageBox.information(self, "Information", "Now Everything is perfect. Please be care full with each and every step from here.")
+        QMessageBox.information(self, "Information", "Check the Image to measure component.")
+        return voltage
 
-    # def on_cal_voltage_current(self):
-    #     time.sleep(5)
-    #     QMessageBox.information(self, "Information", "Now Everything is perfect. Please be care full with each and every step from here.")
-    #     self.on_button_click('images_/images/R709_before_jumper.jpg')
-    #     self.info_label.setText('Calculate Voltage at this component.\n It shouzld be in between 3.28 and 3.38.\n Keep the Ground at the specified connection.\nwait at least 5 seconds to get the readings.')
-    #     time.sleep(5)
-    #     self.DCV_readings[0] = self.multimeter.query('MEAS:VOLT:DC?')
-    #     # if 3.28 <= float(self.DCV_readings[0]) <= 3.38:
-    #     #     self.textBrowser.append('DC Voltage at R709 Component'+str(float(self.DCV_readings[0])))
-    #     #     self.result_label.setStyleSheet("background-color: green;")
-    #     #     self.result_label.setText('DC VOltage @R709\n'+str(float(self.DCV_readings[0])))
-    #     # else:
-    #     #     self.textBrowser.append('DC Voltage at R709 Component'+str(float(self.DCV_readings[0])))
-    #     #     self.result_label.setStyleSheet("background-color: red;")
-    #     #     self.result_label.setText('DC VOltage @R709\n'+str(float(self.DCV_readings[0])))            
-    #     #     # QMessageBox.information(self, "Information", "Now Everything is perfect. Please be care full with each and every step from here.")
-    #     self.on_button_click('images_/images/R700.jpg')
-    #     self.info_label.setText('Calculate Voltage at this component.\n It shouzld be in between 4.98 and 5.08.\n Keep the Ground at the specified connection.\nwait at least 5 seconds to get the readings.')
-    #     time.sleep(10)
-    #     self.DCV_readings[1] = self.multimeter.query('MEAS:VOLT:DC?')
-    #     # if 4.98 <= float(self.DCV_readings[0]) <= 5.08:
-    #     #     self.textBrowser.append('DC Voltage at R700 Component'+str(float(self.DCV_readings[1])))
-    #     #     self.result_label.setStyleSheet("background-color: green;")
-    #     #     self.result_label.setText('DC VOltage @R700\n'+str(float(self.DCV_readings[1])))
-    #     # else:
-    #     #     self.textBrowser.append('DC Voltage at R700 Component'+str(float(self.DCV_readings[1])))
-    #     #     self.result_label.setStyleSheet("background-color: red;")
-    #     #     self.result_label.setText('DC VOltage @R700\n'+str(float(self.DCV_readings[1])))
-    #     #     # QMessageBox.information(self, "Information", "Result has been different with Estimated. Please try all results one more time.")
+    def AC_voltage_C443(self):
+        voltage = float(self.multimeter.query('MEAS:VOLT:AC?'))
+        if voltage <= 0.01:
+            self.textBrowser.append('DC Voltage at AC_voltage_C443 Component'+str(voltage))
+            self.result_label.setStyleSheet("background-color: green;")
+            self.result_label.setText('DC VOltage @R709\n'+str(voltage))
+        else:
+            self.textBrowser.append('DC Voltage at AC_voltage_C443 Component'+str(voltage))
+            self.result_label.setStyleSheet("background-color: red;")
+            self.result_label.setText('DC VOltage AC_voltage_C443\n'+str(voltage))
+            QMessageBox.information(self, "Information", "Now Everything is perfect. Please be care full with each and every step from here.")   
+        QMessageBox.information(self, "Information", "Check the Image to measure component.")
+        return voltage
 
-    #     self.on_button_click('images_/images/R709.jpg')
-    #     self.info_label.setText('wait at least 5 seconds to get the readings.')
-    #     time.sleep(10)
-    #     self.ACV_readings[0] = float(self.multimeter.query('MEAS:VOLT:AC?'))
-    #     # if self.ACV_readings[0] <= 0.01:
-    #     #     self.textBrowser.append('AC Voltage R709'+str(self.ACV_readings[0]))
-    #     #     self.result_label.setStyleSheet("background-color: green;")
-    #     #     self.result_label.setText('DC VOltage @R700\n'+str(float(self.ACV_readings[0])))
-    #     # else:
+    def AC_voltage_C442_C441(self):
+        voltage = float(self.multimeter.query('MEAS:VOLT:AC?'))
+        if voltage <= 0.01:
+            self.textBrowser.append('DC Voltage at AC_voltage_C442_C441 Component'+str(voltage))
+            self.result_label.setStyleSheet("background-color: green;")
+            self.result_label.setText('DC VOltage AC_voltage_C442_C441'+str(voltage))
+        else:
+            self.textBrowser.append('DC Voltage at AC_voltage_C442_C441 Component'+str(voltage))
+            self.result_label.setStyleSheet("background-color: red;")
+            self.result_label.setText('DC VOltage AC_voltage_C442_C441 \n'+str(voltage))
+            QMessageBox.information(self, "Information", "Now Everything is perfect. Please be care full with each and every step from here.")   
+        QMessageBox.information(self, "Information", "Check the Image to measure component.")
+        return voltage
 
-    #     #     QMessageBox.information(self, "Information", "Result has been different with Estimated. Please try all results one more time.")
-        
-    #     self.on_button_click('images_/images/R700.jpg')
-    #     self.info_label.setText('Calculate Voltage at this component.\n It shouzld be in between 4.98 and 5.08.\n Keep the Ground at the specified connection.\nwait at least 5 seconds to get the readings.')
-    #     time.sleep(10)
+    def AC_voltage_C412_C430(self):
+        voltage = float(self.multimeter.query('MEAS:VOLT:AC?'))
+        if voltage <= 0.01:
+            self.textBrowser.append('DC Voltage at AC_voltage_C412_C430 Component'+str(voltage))
+            self.result_label.setStyleSheet("background-color: green;")
+            self.result_label.setText('DC VOltage @AC_voltage_C412_C430\n'+str(voltage))
+        else:
+            self.textBrowser.append('DC Voltage at AC_voltage_C412_C430 Component'+str(voltage))
+            self.result_label.setStyleSheet("background-color: red;")
+            self.result_label.setText('DC VOltage AC_voltage_C412_C430\n'+str(voltage))
+            QMessageBox.information(self, "Information", "Now Everything is perfect. Please be care full with each and every step from here.")   
+        QMessageBox.information(self, "Information", "Check the Image to measure component.")
+        return voltage
 
-    #     self.ACV_readings[1] = self.multimeter.query('MEAS:VOLT:AC?')
-    #     print('R700',float(self.ACV_readings[1]))
-    #     QMessageBox.information(self, "Information", "Change the ground to ISOGND.")
-    #     self.on_button_click('images_/images/C443.jpg')
-    #     self.info_label.setText('Calculate Voltage at this component.\n It shouzld be in between 4.98 and 5.08.\n Keep the Ground at the specified connection.\nwait at least 5 seconds to get the readings.')
-    #     time.sleep(10)
-
-    #     self.DCV_readings[2] = self.multimeter.query('MEAS:VOLT:DC?')
-    #     print('C443',float(self.DCV_readings[2]))
-        
-    #     self.on_button_click('images_/images/C442.jpg')
-    #     self.info_label.setText('Calculate Voltage at this component.\n It shouzld be in between 4.98 and 5.08.\n Keep the Ground at the specified connection.\nwait at least 5 seconds to get the readings.')
-    #     time.sleep(10)
-    #     self.DCV_readings[3] = self.multimeter.query('MEAS:VOLT:DC?')
-    #     print('C442',float(self.DCV_readings[3]))
-        
-    #     self.on_button_click('images_/images/C441.jpg')
-    #     self.info_label.setText('Calculate Voltage at this component.\n It shouzld be in between 4.98 and 5.08.\n Keep the Ground at the specified connection.\nwait at least 5 seconds to get the readings.')
-    #     time.sleep(10)
-    #     self.DCV_readings[4] = self.multimeter.query('MEAS:VOLT:DC?')
-    #     print('C441',float(self.DCV_readings[4]))
-        
-    #     self.on_button_click('images_/images/C412.jpg')
-    #     self.info_label.setText('Calculate Voltage at this component.\n It shouzld be in between 4.98 and 5.08.\n Keep the Ground at the specified connection.\nwait at least 5 seconds to get the readings.')
-    #     time.sleep(10)
-    #     self.DCV_readings[5] = self.multimeter.query('MEAS:VOLT:DC?')
-    #     print('C412',float(self.DCV_readings[5]))
-        
-    #     self.on_button_click('images_/images/C430.jpg')
-    #     self.info_label.setText('Calculate Voltage at this component.\n It shouzld be in between 4.98 and 5.08.\n Keep the Ground at the specified connection.\nwait at least 5 seconds to get the readings.')
-    #     time.sleep(10)
-    #     self.DCV_readings[6] = self.multimeter.query('MEAS:VOLT:DC?')
-    #     print('C430',float(self.DCV_readings[6]))
-        
-    #     self.on_button_click('images_/images/C443.jpg')
-    #     self.info_label.setText('Calculate Voltage at this component.\n It shouzld be in between 4.98 and 5.08.\n Keep the Ground at the specified connection.\nwait at least 5 seconds to get the readings.')
-    #     time.sleep(10)
-    #     self.ACV_readings[2] = self.multimeter.query('MEAS:VOLT:AC?')
-    #     print('C443',float(self.ACV_readings[2]))
-        
-    #     self.on_button_click('images_/images/C442.jpg')
-    #     self.info_label.setText('Calculate Voltage at this component.\n It shouzld be in between 4.98 and 5.08.\n Keep the Ground at the specified connection.\nwait at least 5 seconds to get the readings.')
-    #     time.sleep(10)
-    #     self.ACV_readings[3] = self.multimeter.query('MEAS:VOLT:AC?')
-    #     print('C442',float(self.ACV_readings[3]))
-        
-    #     self.on_button_click('images_/images/C441.jpg')
-    #     self.info_label.setText('Calculate Voltage at this component.\n It shouzld be in between 4.98 and 5.08.\n Keep the Ground at the specified connection.\nwait at least 5 seconds to get the readings.')
-    #     time.sleep(10)
-    #     self.ACV_readings[4] = self.multimeter.query('MEAS:VOLT:AC?')
-    #     print('C441',float(self.ACV_readings[4]))
-        
-    #     self.on_button_click('images_/images/C412.jpg')
-    #     self.info_label.setText('Calculate Voltage at this component.\n It shouzld be in between 4.98 and 5.08.\n Keep the Ground at the specified connection.\nwait at least 5 seconds to get the readings.')
-    #     time.sleep(10)
-    #     self.ACV_readings[5] = self.multimeter.query('MEAS:VOLT:AC?')
-    #     print('C412',float(self.ACV_readings[5]))
-        
-    #     self.on_button_click('images_/images/C430.jpg')
-    #     self.info_label.setText('Calculate Voltage at this component.\n It shouzld be in between 4.98 and 5.08.\n Keep the Ground at the specified connection.\nwait at least 5 seconds to get the readings.')
-    #     time.sleep(10)
-    #     self.ACV_readings[6] = self.multimeter.query('MEAS:VOLT:AC?')
-    #     print('C430',self.ACV_readings[6])
-    #     print('dcv',self.DCV_readings)
-    #     print('acv', self.ACV_readings)
-    print('Hello')
     ########################################################################################################
     def update_time_label(self):
         current_time = QTime.currentTime().toString(Qt.DefaultLocaleLongDate)
