@@ -140,7 +140,7 @@ selection-color: rgb(0, 85, 255);</string>
       <string notr="true"/>
      </property>
      <property name="text">
-      <string>MULTI ON</string>
+      <string>START</string>
      </property>
      <property name="checkable">
       <bool>false</bool>
@@ -169,7 +169,7 @@ selection-color: rgb(0, 85, 255);</string>
       <string>GO</string>
      </property>
      <property name="checkable">
-      <bool>true</bool>
+      <bool>false</bool>
      </property>
      <property name="autoDefault">
       <bool>false</bool>
