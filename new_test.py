@@ -219,6 +219,7 @@ class App(QMainWindow):
             self.info_label.setText('Press "POWER OFF" button')
             self.on_button_click('images_/images/Start2.png')
             self.start_button.setEnabled(False)
+            
             QMessageBox.information(self, 'Information', 'Place the Multimeter Lead at the Component Showing in the Imgae, and Wait for 5 Seconds to read the Voltage..')
             time.sleep(5)
             self.voltage_before_jumper = self.multimeter.query('MEAS:VOLT:DC?')
