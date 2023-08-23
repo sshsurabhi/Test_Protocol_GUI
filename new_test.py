@@ -100,10 +100,39 @@ class App(QMainWindow):
         ########################################################################################################
         self.test_button.setEnabled(False)
         self.save_button.setEnabled(False)
+        self.version_button.setEnabled(False)
+        self.vals_button.setEnabled(False)
         self.value_edit.setEnabled(False)
         self.connect_button.setEnabled(False)
         self.refresh_button.setEnabled(False)
         self.version_edit.setEnabled(False)
+        self.port_box.setEnabled(False)
+        self.baudrate_box.setEnabled(False)
+
+        ##############################################
+        # self.vals_button.setVisible(False)
+        # self.version_button.setVisible(False)
+        # self.value_edit.setVisible(False)
+        # self.version_edit.setVisible(False)
+        # self.test_button.setVisible(False)
+
+        # self.port_label.setVisible(False)
+        # self.baudrate_label.setVisible(False)
+        # self.port_box.setVisible(False)
+        # self.baudrate_box.setVisible(False)
+        # self.connect_button.setVisible(False)
+        # self.refresh_button.setVisible(False)
+    
+        # self.result_label.setVisible(False)
+        # self.save_button.setVisible(False)
+        # self.id_Edit.setVisible(False)
+        # self.Final_result_box.setVisible(False)
+        
+  
+
+
+
+
         self.firstMessage()
         ########################################################################################################
         # self.save_button.clicked.connect(self.create_ini_file)
@@ -122,7 +151,6 @@ class App(QMainWindow):
         msgBox.setWindowTitle("Message")
         self.on_button_click('images_/images/Welcome.jpg')
         msgBox.setStandardButtons(QMessageBox.Ok)
-        self.info_label.setText('Now,\n  Press START Button  ')
         ret_value = msgBox.exec_()
         if ret_value == QMessageBox.Ok:
             self.secondMessage()
@@ -137,7 +165,7 @@ class App(QMainWindow):
         ret_value = msgBox.exec_()
         if ret_value == QMessageBox.Ok:
             self.title_label.setText('Preparation Test')
-            self.info_label.setText('Press START Button')
+            self.info_label.setText('Welcome \n \n Press START')
             self.on_button_click('images_/images/PP1.jpg')
     ########################################################################################################
     def on_button_click(self, file_path):
@@ -152,18 +180,18 @@ class App(QMainWindow):
                 if reply == QMessageBox.Yes:                    
                     self.start_button.setText('NEXT')
                     self.on_button_click('images_/images/On_Devices.jpg')
-                    self.info_label.setText('Power ON of the Powersupply and also Multimeter...\n and wait for 12 seconds.\n Press "Netzteil ON"')                    
+                    self.info_label.setText('Power ON of the Powersupply and also Multimeter...\n and wait for 12 seconds.\n Press "NEXT"')                    
                 else:
                     self.on_button_click('images_/icons/next_1.jpg')
 
     def connect(self):
         if self.start_button.text() == 'START':
             self.on_button_click('images_/images/board_on_mat_.jpg')
-            self.info_label.setText("Place the board on ESD Matte See the Image on the right.\n\nCheck all your environment with the image\n\nCheck All connections.Please close if anything not correct.\n\nIf correct, \n\n''Press STEP1 Button.'' ")
+            self.info_label.setText("Legen Sie die Platine auf die ESD-Matte\n\n(siehe Abbildung rechts).\n\nÜberprüfen Sie die gesamte Umgebung anhand der Abbildung.\n\nPrüfen Sie alle Anschlüsse.\n\n Drücken Sie 'STEP1'.")
             self.start_button.setText("STEP1")
         elif self.start_button.text() == 'STEP1':
             self.on_button_click('images_/images/PP4_.jpg')
-            self.info_label.setText('Check all the "4" screws\n\n of the board, (See the image). Fit all the 4 screws (4x M2,5x5 Torx)\n\ Press "STEP2".')
+            self.info_label.setText('Überprüfen Sie alle "4" Schrauben der Platine (siehe Abbildung).\n\nMontieren Sie alle 4 Schrauben (4x M2,5x5 Torx)\n\nDrücken Sie "STEP2".')
             self.start_button.setText("STEP2")
         elif self.start_button.text() == 'STEP2':
             self.on_button_click('images_/images/board_on_mat.jpg')
@@ -213,7 +241,7 @@ class App(QMainWindow):
                 self.on_button_click('images_/images/close_jumper.jpg')
         elif self.start_button.text()=='STROM':
             self.calc_voltage_before_jumper()
-        elif self.start_button.text() == 'NEXT':
+        elif self.start_button.text() == 'NEXTT':
             self.on_button_click()
         ########################################################################################################
     def load_voltage_current(self):
@@ -299,9 +327,12 @@ class App(QMainWindow):
                 self.powersupply = self.rm.open_resource('TCPIP0::192.168.222.141::INSTR')
                 self.textBrowser.setText(self.powersupply.resource_name)
                 self.start_button.setEnabled(False)
+                # self.start_button.setVisible(False)
                 self.value_edit.setStyleSheet("background-color: lightyellow;")
                 self.info_label.setText('Write CH1 in the Yellow Box (Highlighted)\n \n next to CH \n\n Press "ENTER"')
                 self.value_edit.setEnabled(True)
+                # self.value_edit.setVisible(True)
+                # self.vals_button.setVisible(True)
                 self.vals_button.setText('CH')
                 self.value_edit.setText(self.PS_channel)
                 self.on_button_click('images_/images/PP7.jpg')
@@ -409,7 +440,7 @@ class App(QMainWindow):
                 self.info_label.setText('All Measurements Complete... \n ')
                 self.ACV_readings[6] = self.AC_voltage_C412_C430()
                 self.test_button.setEnabled(False)
-                self.start_button.setText('NEXT')
+                self.start_button.setText('NEXTT')
                 self.start_button.setEnabled(True)
             self.test_index += 1
         else:            
